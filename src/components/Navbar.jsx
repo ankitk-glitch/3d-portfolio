@@ -14,18 +14,18 @@ export default function Navbar() {
   }, []);
 
   const navLinks = [
+    { label: 'Portfolio (22 Models)', href: '#portfolio' },
     { label: '3D BIM Studio', href: '#studio' },
     { label: '2D-to-3D Energy Audit', href: '#energy-workflow' },
-    { label: 'Projects', href: '#projects' },
     { label: 'Capabilities', href: '#capabilities' },
-    { label: 'Standards & Compliance', href: '#standards' },
+    { label: 'Standards', href: '#standards' },
   ];
 
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? 'bg-slate-950/85 backdrop-blur-xl border-b border-slate-800/80 shadow-2xl py-3'
+          ? 'bg-slate-950/90 backdrop-blur-xl border-b border-slate-800/80 shadow-2xl py-3'
           : 'bg-transparent py-5'
       }`}
     >
@@ -43,7 +43,7 @@ export default function Navbar() {
               <span className="text-cyan-400 text-xs px-1.5 py-0.2 rounded bg-cyan-950/80 border border-cyan-800/50 font-mono">BIM</span>
             </div>
             <div className="text-[10px] font-mono text-slate-400 tracking-wider">
-              theribhus.com &bull; Architectural & Energy
+              theribhus.com &bull; 3D Modeling Portfolio
             </div>
           </div>
         </a>
