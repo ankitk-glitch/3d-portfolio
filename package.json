@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "deploy": "cd dist && rm -rf .git && git init -b gh-pages && git add -A && git commit -m 'deploy: update' && git remote add origin https://github.com/ankitk-glitch/3d-portfolio.git && git push origin gh-pages --force && rm -rf .git"
   },
   "dependencies": {
     "canvas-confetti": "^1.9.4",
