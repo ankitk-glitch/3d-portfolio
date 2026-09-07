@@ -3,25 +3,33 @@ import {
   ChevronLeft, 
   ChevronRight, 
   Printer, 
-  Download, 
   Layers, 
   Building2, 
-  Flame, 
   CheckCircle2, 
   FileText, 
   Mail, 
   Globe, 
-  Maximize2,
-  ZoomIn,
-  Sparkles,
-  Table
+  Flame,
+  ArrowRight,
+  Maximize2
 } from 'lucide-react';
 
-export default function PortfolioBook({ onOpenProjectModal }) {
+export default function PortfolioBook() {
   const [currentPage, setCurrentPage] = useState(0);
 
-  const totalPages = 10;
+  const sheets = [
+    { idx: 0, title: 'Cover Page', code: '01 COVER' },
+    { idx: 1, title: 'About & Skills', code: '02 INTRO' },
+    { idx: 2, title: 'P1: Overview (Single-Family)', code: '03 P1-VIEW' },
+    { idx: 3, title: 'P1: Model Organisation & 3D', code: '04 P1-3D' },
+    { idx: 4, title: 'P1: Drawing Output (Plan/Sec/Elev)', code: '05 P1-DOCS' },
+    { idx: 5, title: 'P1: Energy Audit & Heat Load', code: '06 P1-AUDIT' },
+    { idx: 6, title: 'P2: Multi-Story Residential', code: '07 P2-MULTI' },
+    { idx: 7, title: 'P3: 3D Architectural Floor Layout', code: '08 P3-PLAN' },
+    { idx: 8, title: 'Contact: Let\'s Connect', code: '09 CONNECT' },
+  ];
 
+  const totalPages = sheets.length;
   const nextPage = () => setCurrentPage((p) => Math.min(p + 1, totalPages - 1));
   const prevPage = () => setCurrentPage((p) => Math.max(p - 1, 0));
 
@@ -30,985 +38,778 @@ export default function PortfolioBook({ onOpenProjectModal }) {
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto my-10 space-y-6">
-      {/* Book Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-4 bg-slate-900/90 border border-slate-700/80 p-3.5 rounded-2xl shadow-xl">
-        <div className="flex items-center gap-3">
-          <div className="px-3 py-1 rounded-lg bg-cyan-950 text-cyan-300 border border-cyan-800/60 font-mono text-xs font-bold flex items-center gap-1.5">
-            <FileText size={14} />
-            <span>PORTFOLIO SHEET VIEW</span>
+    <section id="portfolio-deck" className="py-16 bg-slate-100 border-b border-slate-200">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        
+        {/* Presentation Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-slate-300 text-xs font-mono font-bold text-slate-700 shadow-sm mb-2">
+              <FileText size={13} className="text-cyan-700" />
+              <span>Architectural Presentation Portfolio Sheets</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+              BIM Portfolio Sheets &bull; Page-by-Page
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-600">
+              Structured according to European architectural submission standards. Navigate through individual sheets below or export as a printable PDF.
+            </p>
           </div>
-          <span className="text-xs text-slate-300 font-mono">
-            Sheet {currentPage + 1} of {totalPages}
-          </span>
+
+          <button
+            onClick={handlePrint}
+            className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-cyan-800 text-white font-mono text-xs font-bold flex items-center gap-2 shadow-md transition-all self-start md:self-auto cursor-pointer"
+          >
+            <Printer size={15} />
+            <span>Print / Save as PDF Portfolio</span>
+          </button>
         </div>
 
-        {/* Quick Page Jump Pills */}
-        <div className="hidden md:flex items-center gap-1.5 text-[11px] font-mono">
-          {[
-            { idx: 0, label: 'Cover' },
-            { idx: 1, label: 'Intro & Skills' },
-            { idx: 2, label: 'P1: Overview' },
-            { idx: 3, label: 'P1: Process & 3D' },
-            { idx: 4, label: 'P1: Drawing Output' },
-            { idx: 5, label: 'P1: Energy & Clash' },
-            { idx: 6, label: 'P2: Commercial' },
-            { idx: 7, label: 'P3: Energy Audit' },
-            { idx: 8, label: 'P3: Raumbuch' },
-            { idx: 9, label: 'Contact' },
-          ].map((item) => (
+        {/* Sheet Navigator Bar */}
+        <div className="flex flex-wrap items-center justify-between gap-3 bg-white border border-slate-200 p-3 rounded-2xl shadow-sm">
+          <div className="flex items-center gap-2 text-xs font-mono font-bold text-slate-800">
+            <span className="w-2.5 h-2.5 rounded-full bg-cyan-600"></span>
+            <span>SHEET {currentPage + 1} OF {totalPages}:</span>
+            <span className="text-cyan-800">{sheets[currentPage].title}</span>
+          </div>
+
+          {/* Quick Jump Buttons */}
+          <div className="hidden lg:flex items-center gap-1 text-[11px] font-mono">
+            {sheets.map((s) => (
+              <button
+                key={s.idx}
+                onClick={() => setCurrentPage(s.idx)}
+                className={`px-2.5 py-1 rounded-lg transition-colors cursor-pointer ${
+                  currentPage === s.idx
+                    ? 'bg-slate-900 text-white font-bold'
+                    : 'bg-slate-50 hover:bg-slate-100 text-slate-600'
+                }`}
+              >
+                {s.code}
+              </button>
+            ))}
+          </div>
+
+          {/* Controls */}
+          <div className="flex items-center gap-2">
             <button
-              key={item.idx}
-              onClick={() => setCurrentPage(item.idx)}
-              className={`px-2.5 py-1 rounded-lg transition-colors ${
-                currentPage === item.idx
-                  ? 'bg-cyan-600 text-white font-bold'
-                  : 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700'
-              }`}
+              onClick={prevPage}
+              disabled={currentPage === 0}
+              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
+              title="Previous Sheet"
             >
-              {item.label}
+              <ChevronLeft size={18} />
             </button>
+            <button
+              onClick={nextPage}
+              disabled={currentPage === totalPages - 1}
+              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
+              title="Next Sheet"
+            >
+              <ChevronRight size={18} />
+            </button>
+          </div>
+        </div>
+
+        {/* The Landscape Sheet Board (A3/A4 Landscape 16:10 Ratio) */}
+        <div className="relative w-full aspect-[16/10] sm:aspect-[1.414/1] bg-white text-slate-900 rounded-2xl shadow-xl overflow-hidden border-2 border-slate-800 p-6 sm:p-10 flex flex-col justify-between font-sans print:border-none print:shadow-none print:m-0 print:p-8">
+          
+          {/* ============================================================ */}
+          {/* SHEET 1: COVER PAGE                                         */}
+          {/* ============================================================ */}
+          {currentPage === 0 && (
+            <div className="h-full flex flex-col justify-between animate-fadeIn">
+              <div className="flex items-center justify-between border-b-2 border-slate-900 pb-3">
+                <span className="text-xs font-mono uppercase tracking-widest text-slate-500 font-bold">
+                  1. COVER PAGE &bull; SHEET 01
+                </span>
+                <span className="text-xs font-mono font-bold text-slate-900">
+                  THE RIBHUS &bull; theribhus.com
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center flex-1 my-4">
+                <div className="md:col-span-6 space-y-5">
+                  <div>
+                    <span className="text-xs font-mono uppercase tracking-widest text-cyan-800 font-bold block mb-1">
+                      BIM ARCHITECTURAL &amp; ENERGY MODELING PORTFOLIO
+                    </span>
+                    <h1 className="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight">
+                      THE RIBHUS
+                    </h1>
+                    <h2 className="text-lg sm:text-xl font-bold text-slate-700 font-mono tracking-tight mt-1">
+                      BIM ARCHITECT &bull; EUROPEAN PRODUCTION
+                    </h2>
+                  </div>
+
+                  <div className="w-16 h-1 bg-cyan-700"></div>
+
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-md">
+                    Specialized in converting scanned paper blueprints, rough PDF drawings, and 2D CAD surveys into millimeter-accurate, production-ready <strong className="text-slate-900">ArchiCAD and Revit 3D architectural models</strong> and watertight thermal envelopes.
+                  </p>
+
+                  <div className="space-y-1.5 text-xs font-mono text-slate-700 pt-2 border-t border-slate-200">
+                    <div>✉️ contact@theribhus.com</div>
+                    <div>🌐 theribhus.com</div>
+                    <div>📍 Dedicated European Engineering Pods (Germany / Austria / Switzerland / Europe)</div>
+                  </div>
+                </div>
+
+                <div className="md:col-span-6 h-full flex items-center justify-center">
+                  <div className="relative w-full h-[280px] sm:h-[360px] rounded-2xl overflow-hidden shadow-2xl border-4 border-slate-900 bg-slate-950">
+                    <img
+                      src="assets/portfolio/1_Single_Family_Home_LOD200.jpg"
+                      alt="The Ribhus Flagship Model"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent p-4 text-white">
+                      <div className="text-[10px] font-mono text-cyan-400 font-bold uppercase">LOD 200 / LOD 300 Architectural Volume</div>
+                      <div className="text-sm font-bold">Watertight Thermal Envelope Model</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t border-slate-300 pt-3 flex items-center justify-between text-[11px] font-mono text-slate-500">
+                <span>Fast 24–48h Turnaround &bull; Native ArchiCAD &amp; Revit</span>
+                <span>Sheet 01 of 09</span>
+              </div>
+            </div>
+          )}
+
+          {/* ============================================================ */}
+          {/* SHEET 2: ABOUT & SKILLS                                     */}
+          {/* ============================================================ */}
+          {currentPage === 1 && (
+            <div className="h-full flex flex-col justify-between animate-fadeIn">
+              <div className="flex items-center justify-between border-b-2 border-slate-900 pb-3">
+                <span className="text-xs font-mono uppercase tracking-widest text-slate-500 font-bold">
+                  2. INTRODUCTION &amp; SKILLS &bull; SHEET 02
+                </span>
+                <span className="text-xs font-mono font-bold text-slate-900">
+                  THE RIBHUS &bull; theribhus.com
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-8 my-auto py-4">
+                <div className="md:col-span-5 space-y-4">
+                  <div className="relative h-48 rounded-xl overflow-hidden shadow-md border border-slate-300">
+                    <img
+                      src="assets/portfolio/2_Multi_Story_Residential_LOD300.jpg"
+                      alt="Multi-Story Residential Model"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+
+                  <div>
+                    <h3 className="text-base font-black text-slate-900 uppercase">
+                      About The Ribhus
+                    </h3>
+                    <p className="text-xs text-slate-600 leading-relaxed mt-1">
+                      Operating as a seamless external BIM pod for European architectural studios and Energieberater. We eliminate drafting bottlenecks by delivering precise 3D models from 2D archives without bloated MEP overhead.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="md:col-span-7 space-y-5">
+                  <div>
+                    <h4 className="text-xs uppercase font-mono tracking-wider font-bold text-slate-900 mb-2">
+                      Software Proficiency
+                    </h4>
+                    <div className="grid grid-cols-2 gap-2.5 text-xs font-mono">
+                      <div className="p-2.5 rounded-lg border border-slate-200 bg-slate-50">
+                        <div className="font-bold text-slate-900">ArchiCAD (v26–28)</div>
+                        <div className="text-[10px] text-slate-500">Composite walls, GDL parametric objects, IFC mapping</div>
+                      </div>
+                      <div className="p-2.5 rounded-lg border border-slate-200 bg-slate-50">
+                        <div className="font-bold text-slate-900">Autodesk Revit</div>
+                        <div className="text-[10px] text-slate-500">LOD 300 families, floor zoning, drawing extractions</div>
+                      </div>
+                      <div className="p-2.5 rounded-lg border border-slate-200 bg-slate-50">
+                        <div className="font-bold text-slate-900">AutoCAD (DWG/DXF)</div>
+                        <div className="text-[10px] text-slate-500">Survey calibration &amp; 2D underlay cleanups</div>
+                      </div>
+                      <div className="p-2.5 rounded-lg border border-slate-200 bg-slate-50">
+                        <div className="font-bold text-slate-900">OpenBIM IFC4 / 2x3</div>
+                        <div className="text-[10px] text-slate-500">Watertight simulation geometry for Solar-Computer</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="text-xs uppercase font-mono tracking-wider font-bold text-slate-900 mb-2">
+                      Standards &amp; Certifications
+                    </h4>
+                    <div className="space-y-1 text-xs text-slate-700 font-mono">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 size={13} className="text-emerald-600" />
+                        <span><strong>DIN EN 12831:</strong> Design heat load &amp; thermal zone envelope calculation</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 size={13} className="text-emerald-600" />
+                        <span><strong>GEG 2024:</strong> German Building Energy Act envelope area verification</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 size={13} className="text-emerald-600" />
+                        <span><strong>DIN 277:</strong> Floor areas (BGF, NRF) &amp; gross cubic volume (BRI)</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t border-slate-300 pt-3 flex items-center justify-between text-[11px] font-mono text-slate-500">
+                <span>Introduction &amp; Capabilities</span>
+                <span>Sheet 02 of 09</span>
+              </div>
+            </div>
+          )}
+
+          {/* ============================================================ */}
+          {/* SHEET 3: PROJECT 1 – OVERVIEW                               */}
+          {/* ============================================================ */}
+          {currentPage === 2 && (
+            <div className="h-full flex flex-col justify-between animate-fadeIn">
+              <div className="flex items-center justify-between border-b-2 border-slate-900 pb-3">
+                <span className="text-xs font-mono uppercase tracking-widest text-slate-500 font-bold">
+                  3. PROJECT 1 &bull; PROJECT OVERVIEW &bull; SHEET 03
+                </span>
+                <span className="text-xs font-mono font-bold text-slate-900">
+                  Modern Single-Family House (Einfamilienhaus)
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-8 my-auto py-4 items-center">
+                <div className="md:col-span-5 space-y-4">
+                  <div>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-100 text-cyan-800 border border-cyan-300">
+                      LOD 200 ARCHITECTURAL VOLUME
+                    </span>
+                    <h3 className="text-2xl font-black text-slate-900 mt-1">
+                      Modern Single-Family House
+                    </h3>
+                    <p className="text-xs font-mono text-slate-500">Einfamilienhaus &bull; Energy Consulting &bull; 2025</p>
+                  </div>
+
+                  <div className="space-y-1.5 font-mono text-xs border-y border-slate-200 py-3 text-slate-700">
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Scope:</span>
+                      <span className="font-bold">2D PDF to 3D BIM Model</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Software:</span>
+                      <span className="font-bold text-cyan-800">ArchiCAD / IFC</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Gross Floor Area:</span>
+                      <span className="font-bold">280 m² (BGF)</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Turnaround:</span>
+                      <span className="font-bold text-emerald-700">Delivered in 24 Hours</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Primary Use:</span>
+                      <span className="font-bold text-slate-900">Thermal Envelope &amp; Permit</span>
+                    </div>
+                  </div>
+
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    Rapid conversion of client-supplied 2D PDF architectural plans into an accurate LOD 200 architectural volume. Modeled with continuous exterior envelope boundaries for direct integration into heating load simulation software.
+                  </p>
+                </div>
+
+                <div className="md:col-span-7 h-full flex items-center justify-center">
+                  <div className="relative w-full h-[280px] sm:h-[360px] rounded-2xl overflow-hidden shadow-xl border border-slate-300 bg-slate-900">
+                    <img
+                      src="assets/portfolio/1_Single_Family_Home_LOD200.jpg"
+                      alt="Modern Single-Family House"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute top-3 left-3 px-2 py-0.5 rounded bg-slate-900/80 text-[10px] font-mono text-white">
+                      3D Perspective View
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t border-slate-300 pt-3 flex items-center justify-between text-[11px] font-mono text-slate-500">
+                <span>Project Overview &bull; Single-Family Residential</span>
+                <span>Sheet 03 of 09</span>
+              </div>
+            </div>
+          )}
+
+          {/* ============================================================ */}
+          {/* SHEET 4: PROJECT 1 – MODEL ORGANISATION & 3D                */}
+          {/* ============================================================ */}
+          {currentPage === 3 && (
+            <div className="h-full flex flex-col justify-between animate-fadeIn">
+              <div className="flex items-center justify-between border-b-2 border-slate-900 pb-3">
+                <span className="text-xs font-mono uppercase tracking-widest text-slate-500 font-bold">
+                  3. PROJECT 1 &bull; MODEL ORGANISATION &amp; 3D AXONOMETRIC &bull; SHEET 04
+                </span>
+                <span className="text-xs font-mono font-bold text-slate-900">
+                  Model Hierarchy &bull; 3D Axonometric
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-8 my-auto py-3 items-center">
+                <div className="md:col-span-5 space-y-4 font-mono text-xs">
+                  <div className="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-2">
+                    <div className="text-[10px] uppercase font-bold text-slate-500">
+                      Model Browser Structure
+                    </div>
+                    <div className="space-y-1 text-slate-700 text-[11px]">
+                      <div>📁 Single_Family_House.pln</div>
+                      <div className="pl-3 space-y-0.5 text-slate-600">
+                        <div>├─ 🏢 EG: Ground Floor (0.00m)</div>
+                        <div>├─ 🏢 1.OG: Upper Living (+3.10m)</div>
+                        <div>└─ 🏢 DG: Insulated Warm Roof (+6.20m)</div>
+                      </div>
+                      <div className="pt-2 font-bold text-slate-900">
+                        <span>Classification &amp; Quantities:</span>
+                      </div>
+                      <div className="pl-3 space-y-0.5 text-slate-600">
+                        <div>├─ Exterior Wall (WDVS 36.5cm): 380 m²</div>
+                        <div>├─ Slabs (Concrete C25/30): 280 m²</div>
+                        <div>└─ Fenestration (Triple Glazed): 68 m²</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-cyan-50 border border-cyan-200 text-cyan-900 text-xs font-sans space-y-1">
+                    <strong className="block text-[11px] uppercase font-mono">BIM Workflow:</strong>
+                    <div className="grid grid-cols-4 gap-1 text-[10px] font-mono text-center pt-1">
+                      <span className="p-1 rounded bg-white font-bold">1. Align</span>
+                      <span className="p-1 rounded bg-white font-bold">2. Model</span>
+                      <span className="p-1 rounded bg-white font-bold">3. Check</span>
+                      <span className="p-1 rounded bg-white font-bold">4. Export</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="md:col-span-7 h-full flex items-center justify-center">
+                  <div className="relative w-full h-[280px] sm:h-[360px] rounded-2xl overflow-hidden border border-slate-300 bg-white p-2 shadow-lg">
+                    <img
+                      src="assets/drawings/axonometric_exploded.jpg"
+                      alt="3D Exploded Axonometric BIM Model"
+                      className="w-full h-full object-contain"
+                    />
+                    <div className="absolute top-4 left-4 px-2 py-0.5 rounded bg-slate-900/80 text-[10px] font-mono text-cyan-300">
+                      3D Exploded Axonometric Model
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t border-slate-300 pt-3 flex items-center justify-between text-[11px] font-mono text-slate-500">
+                <span>Model Organisation &amp; 3D Disassembly</span>
+                <span>Sheet 04 of 09</span>
+              </div>
+            </div>
+          )}
+
+          {/* ============================================================ */}
+          {/* SHEET 5: PROJECT 1 – DRAWING OUTPUT (PLAN, SECTION, ELEVATION) */}
+          {/* ============================================================ */}
+          {currentPage === 4 && (
+            <div className="h-full flex flex-col justify-between animate-fadeIn">
+              <div className="flex items-center justify-between border-b-2 border-slate-900 pb-3">
+                <span className="text-xs font-mono uppercase tracking-widest text-slate-500 font-bold">
+                  3. PROJECT 1 &bull; DRAWING OUTPUT (2D CD EXTRACTION) &bull; SHEET 05
+                </span>
+                <span className="text-xs font-mono font-bold text-slate-900">
+                  Floor Plan &bull; Section A-A &bull; North Elevation
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-4 my-auto py-2 flex-1 items-center">
+                {/* Plan */}
+                <div className="md:col-span-6 h-[180px] sm:h-[210px] rounded-xl overflow-hidden border border-slate-300 bg-white shadow-sm p-1 flex flex-col justify-between">
+                  <div className="h-[85%] w-full overflow-hidden">
+                    <img
+                      src="assets/drawings/floor_plan.jpg"
+                      alt="Ground Floor Plan"
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                  <div className="px-2 py-0.5 bg-slate-100 text-[10px] font-mono text-slate-700 flex justify-between font-bold">
+                    <span>GROUND FLOOR PLAN</span>
+                    <span>1:100</span>
+                  </div>
+                </div>
+
+                {/* Section */}
+                <div className="md:col-span-6 h-[180px] sm:h-[210px] rounded-xl overflow-hidden border border-slate-300 bg-white shadow-sm p-1 flex flex-col justify-between">
+                  <div className="h-[85%] w-full overflow-hidden">
+                    <img
+                      src="assets/drawings/section_drawing.jpg"
+                      alt="Building Section A-A"
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                  <div className="px-2 py-0.5 bg-slate-100 text-[10px] font-mono text-slate-700 flex justify-between font-bold">
+                    <span>SECTION A-A</span>
+                    <span>1:100</span>
+                  </div>
+                </div>
+
+                {/* Elevation */}
+                <div className="md:col-span-7 h-[150px] sm:h-[170px] rounded-xl overflow-hidden border border-slate-300 bg-white shadow-sm p-1 flex flex-col justify-between">
+                  <div className="h-[80%] w-full overflow-hidden">
+                    <img
+                      src="assets/drawings/elevation_drawing.jpg"
+                      alt="North Facade Elevation"
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                  <div className="px-2 py-0.5 bg-slate-100 text-[10px] font-mono text-slate-700 flex justify-between font-bold">
+                    <span>NORTH ELEVATION</span>
+                    <span>1:100</span>
+                  </div>
+                </div>
+
+                {/* Area Table */}
+                <div className="md:col-span-5 h-[150px] sm:h-[170px] rounded-xl overflow-hidden border border-slate-200 bg-slate-50 p-3 flex flex-col justify-between font-mono text-[10px]">
+                  <div className="font-bold text-slate-900 border-b border-slate-200 pb-1">
+                    DIN 277 AREA SCHEDULE
+                  </div>
+                  <div className="space-y-1 text-slate-700">
+                    <div className="flex justify-between">
+                      <span>Ground Floor (EG)</span>
+                      <span className="font-bold">145 m²</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Upper Floor (1.OG)</span>
+                      <span className="font-bold">135 m²</span>
+                    </div>
+                    <div className="flex justify-between border-t border-slate-200 pt-1 font-bold text-slate-900">
+                      <span>Total BGF</span>
+                      <span className="text-cyan-800">280 m²</span>
+                    </div>
+                  </div>
+                  <div className="text-[9px] text-slate-400 text-right">Extracted from 3D Geometry</div>
+                </div>
+              </div>
+
+              <div className="border-t border-slate-300 pt-3 flex items-center justify-between text-[11px] font-mono text-slate-500">
+                <span>Architectural Drawing Sets Extraction</span>
+                <span>Sheet 05 of 09</span>
+              </div>
+            </div>
+          )}
+
+          {/* ============================================================ */}
+          {/* SHEET 6: PROJECT 1 – ENERGY AUDIT & HEAT LOAD               */}
+          {/* ============================================================ */}
+          {currentPage === 5 && (
+            <div className="h-full flex flex-col justify-between animate-fadeIn">
+              <div className="flex items-center justify-between border-b-2 border-slate-900 pb-3">
+                <span className="text-xs font-mono uppercase tracking-widest text-slate-500 font-bold">
+                  3. PROJECT 1 &bull; 2D-TO-3D ENERGY AUDIT &bull; SHEET 06
+                </span>
+                <span className="text-xs font-mono font-bold text-slate-900">
+                  DIN EN 12831 &bull; GEG 2024
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-8 my-auto py-3 items-center">
+                <div className="md:col-span-7 h-full flex items-center justify-center">
+                  <div className="relative w-full h-[280px] sm:h-[360px] rounded-2xl overflow-hidden shadow-lg border border-slate-300 bg-white p-2">
+                    <img
+                      src="assets/drawings/energy_audit_comparison.jpg"
+                      alt="2D to 3D Energy Audit Comparison"
+                      className="w-full h-full object-contain"
+                    />
+                    <div className="absolute top-4 left-4 px-2 py-0.5 rounded bg-amber-900/90 text-amber-200 font-mono text-[10px]">
+                      2D Blueprint &rarr; 3D Thermal Zone Model
+                    </div>
+                  </div>
+                </div>
+
+                <div className="md:col-span-5 space-y-4 font-mono text-xs">
+                  <div>
+                    <span className="px-2 py-0.5 rounded text-[10px] bg-emerald-100 text-emerald-800 font-bold">
+                      WATERTIGHT THERMAL HULL
+                    </span>
+                    <h3 className="text-base font-black text-slate-900 font-sans mt-1">
+                      Heating Load Takeoff (Heizlast)
+                    </h3>
+                    <p className="text-xs text-slate-600 font-sans mt-0.5">
+                      Direct volumetric calculation for German building energy consultants without polygon errors.
+                    </p>
+                  </div>
+
+                  <div className="border border-slate-200 rounded-xl overflow-hidden bg-slate-50 p-3 space-y-1.5 text-[11px]">
+                    <div className="flex justify-between text-slate-600">
+                      <span>Heated Volume (Ve):</span>
+                      <span className="font-bold text-slate-900">840 m³</span>
+                    </div>
+                    <div className="flex justify-between text-slate-600">
+                      <span>Envelope Area (A):</span>
+                      <span className="font-bold text-slate-900">540 m²</span>
+                    </div>
+                    <div className="flex justify-between text-slate-600">
+                      <span>Compactness (A/Ve):</span>
+                      <span className="font-bold text-amber-700">0.64 m⁻¹</span>
+                    </div>
+                    <div className="flex justify-between text-slate-600">
+                      <span>Wall U-Value:</span>
+                      <span className="font-bold text-emerald-700">0.21 W/m²K</span>
+                    </div>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 text-xs font-sans">
+                    <strong>Software Compatibility:</strong> Direct import into Solar-Computer, Hottgenroth, and IDA ICE via clean IFC2x3.
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t border-slate-300 pt-3 flex items-center justify-between text-[11px] font-mono text-slate-500">
+                <span>Thermal Envelope Calculation &bull; DIN EN 12831</span>
+                <span>Sheet 06 of 09</span>
+              </div>
+            </div>
+          )}
+
+          {/* ============================================================ */}
+          {/* SHEET 7: PROJECT 2 – MULTI-STORY RESIDENTIAL                */}
+          {/* ============================================================ */}
+          {currentPage === 6 && (
+            <div className="h-full flex flex-col justify-between animate-fadeIn">
+              <div className="flex items-center justify-between border-b-2 border-slate-900 pb-3">
+                <span className="text-xs font-mono uppercase tracking-widest text-slate-500 font-bold">
+                  4. PROJECT 2 &bull; MULTI-STORY RESIDENTIAL &bull; SHEET 07
+                </span>
+                <span className="text-xs font-mono font-bold text-slate-900">
+                  Urban Multi-Story Residential Building (LOD 300)
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-8 my-auto py-4 items-center">
+                <div className="md:col-span-5 space-y-4">
+                  <div>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-100 text-cyan-800 border border-cyan-300">
+                      LOD 300 ARCHITECTURAL MODEL
+                    </span>
+                    <h3 className="text-2xl font-black text-slate-900 mt-1">
+                      Urban Multi-Story Residential
+                    </h3>
+                    <p className="text-xs font-mono text-slate-500">1,850 m² BGF &bull; Autodesk Revit</p>
+                  </div>
+
+                  <div className="space-y-1.5 font-mono text-xs border-y border-slate-200 py-3 text-slate-700">
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Scope:</span>
+                      <span className="font-bold">2D CAD to 3D BIM (LOD 300)</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Software:</span>
+                      <span className="font-bold text-blue-800">Autodesk Revit</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Primary Use:</span>
+                      <span className="font-bold text-slate-900">Space Planning &amp; Volumetric Takeoff</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Turnaround:</span>
+                      <span className="font-bold text-emerald-700">3 Business Days</span>
+                    </div>
+                  </div>
+
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    Accurate translation of 2D CAD architectural plan sets into a multi-story Revit building model. Coordinated core structures, modular apartment floor layouts, and exterior window schedule takeoff.
+                  </p>
+                </div>
+
+                <div className="md:col-span-7 h-full flex items-center justify-center">
+                  <div className="relative w-full h-[280px] sm:h-[360px] rounded-2xl overflow-hidden shadow-xl border border-slate-300 bg-slate-900">
+                    <img
+                      src="assets/portfolio/2_Multi_Story_Residential_LOD300.jpg"
+                      alt="Urban Multi-Story Residential Building"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute top-3 left-3 px-2 py-0.5 rounded bg-slate-900/80 text-[10px] font-mono text-white">
+                      Revit 3D Model Perspective
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t border-slate-300 pt-3 flex items-center justify-between text-[11px] font-mono text-slate-500">
+                <span>Multi-Story Residential Modeling (LOD 300)</span>
+                <span>Sheet 07 of 09</span>
+              </div>
+            </div>
+          )}
+
+          {/* ============================================================ */}
+          {/* SHEET 8: PROJECT 3 – DETAILED 3D FLOOR LAYOUT               */}
+          {/* ============================================================ */}
+          {currentPage === 7 && (
+            <div className="h-full flex flex-col justify-between animate-fadeIn">
+              <div className="flex items-center justify-between border-b-2 border-slate-900 pb-3">
+                <span className="text-xs font-mono uppercase tracking-widest text-slate-500 font-bold">
+                  5. PROJECT 3 &bull; 3D ARCHITECTURAL FLOOR LAYOUT &bull; SHEET 08
+                </span>
+                <span className="text-xs font-mono font-bold text-slate-900">
+                  Detailed 3D Visual Plan
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-8 my-auto py-4 items-center">
+                <div className="md:col-span-5 space-y-4">
+                  <div>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-100 text-cyan-800 border border-cyan-300">
+                      PRESENTATION 3D FLOORPLAN
+                    </span>
+                    <h3 className="text-2xl font-black text-slate-900 mt-1">
+                      Detailed 3D Visual Plan
+                    </h3>
+                    <p className="text-xs font-mono text-slate-500">ArchiCAD &bull; High-Res Render &bull; 165 m²</p>
+                  </div>
+
+                  <div className="space-y-1.5 font-mono text-xs border-y border-slate-200 py-3 text-slate-700">
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Scope:</span>
+                      <span className="font-bold">2D Survey Sketch to Detailed 3D Plan</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Software:</span>
+                      <span className="font-bold text-cyan-800">ArchiCAD &amp; Presentation Engine</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Primary Use:</span>
+                      <span className="font-bold text-slate-900">Brochures &amp; Tenant Planning</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Turnaround:</span>
+                      <span className="font-bold text-emerald-700">24–48 Hours</span>
+                    </div>
+                  </div>
+
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    Designed for real estate marketing, client presentations, and tenant space planning. Color-coded floor finishes, accurate wall thicknesses, and clear visual circulation flow.
+                  </p>
+                </div>
+
+                <div className="md:col-span-7 h-full flex items-center justify-center">
+                  <div className="relative w-full h-[280px] sm:h-[360px] rounded-2xl overflow-hidden shadow-xl border border-slate-300 bg-slate-900">
+                    <img
+                      src="assets/portfolio/3_Architectural_Floorplan_3D.jpg"
+                      alt="Detailed 3D Architectural Floor Layout"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute top-3 left-3 px-2 py-0.5 rounded bg-slate-900/80 text-[10px] font-mono text-white">
+                      3D Axonometric Floor Cutaway
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t border-slate-300 pt-3 flex items-center justify-between text-[11px] font-mono text-slate-500">
+                <span>3D Architectural Floor Layout</span>
+                <span>Sheet 08 of 09</span>
+              </div>
+            </div>
+          )}
+
+          {/* ============================================================ */}
+          {/* SHEET 9: CONTACT PAGE                                       */}
+          {/* ============================================================ */}
+          {currentPage === 8 && (
+            <div className="h-full flex flex-col justify-between animate-fadeIn">
+              <div className="flex items-center justify-between border-b-2 border-slate-900 pb-3">
+                <span className="text-xs font-mono uppercase tracking-widest text-slate-500 font-bold">
+                  6. CONTACT PAGE &bull; SHEET 09
+                </span>
+                <span className="text-xs font-mono font-bold text-slate-900">
+                  THE RIBHUS &bull; theribhus.com
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-8 my-auto py-6 items-center">
+                <div className="md:col-span-6 space-y-6">
+                  <div>
+                    <span className="text-xs font-mono uppercase tracking-widest text-cyan-800 font-bold block mb-1">
+                      GET IN TOUCH
+                    </span>
+                    <h2 className="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight">
+                      LET'S CONNECT
+                    </h2>
+                    <div className="w-16 h-1 bg-cyan-700 mt-2"></div>
+                  </div>
+
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-md">
+                    Looking for a dedicated architectural BIM partner to handle your 2D-to-3D conversions or weekly drafting volume? Contact The Ribhus team today.
+                  </p>
+
+                  <div className="space-y-3 font-mono text-xs text-slate-800 border-t border-slate-200 pt-4">
+                    <div className="flex items-center gap-3">
+                      <span className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center font-bold text-slate-900">@</span>
+                      <div>
+                        <span className="text-slate-400 block text-[10px]">EMAIL ADDRESS</span>
+                        <a href="mailto:contact@theribhus.com" className="font-bold text-slate-900 hover:text-cyan-700">contact@theribhus.com</a>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <span className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center font-bold text-slate-900">🌐</span>
+                      <div>
+                        <span className="text-slate-400 block text-[10px]">WEBSITE</span>
+                        <a href="https://theribhus.com" target="_blank" rel="noopener noreferrer" className="font-bold text-slate-900 hover:text-cyan-700">theribhus.com</a>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <span className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center font-bold text-slate-900">💶</span>
+                      <div>
+                        <span className="text-slate-400 block text-[10px]">FIXED PRICE QUOTES</span>
+                        <span className="font-bold text-slate-900">Starting from €180 per unit</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="md:col-span-6 h-full flex items-center justify-center">
+                  <div className="relative w-full h-[280px] sm:h-[360px] rounded-2xl overflow-hidden shadow-xl border border-slate-300 bg-slate-900 p-2">
+                    <img
+                      src="assets/portfolio/2_Multi_Story_Residential_LOD300.jpg"
+                      alt="The Ribhus Architecture"
+                      className="w-full h-full object-cover rounded-xl"
+                    />
+                    <div className="absolute bottom-4 left-4 right-4 p-3 bg-slate-950/85 backdrop-blur-md rounded-xl text-white font-mono text-[11px]">
+                      <span className="text-cyan-400 font-bold">The Ribhus Studio</span> &bull; 24–48h Turnaround Across Europe
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t border-slate-300 pt-3 flex items-center justify-between text-[11px] font-mono text-slate-500">
+                <span>The Ribhus &bull; All Rights Reserved</span>
+                <span>Sheet 09 of 09 &bull; End of Deck</span>
+              </div>
+            </div>
+          )}
+
+        </div>
+
+        {/* Sheet Thumbnails Navigator */}
+        <div className="flex items-center justify-center gap-2 pt-1">
+          {sheets.map((s) => (
+            <button
+              key={s.idx}
+              onClick={() => setCurrentPage(s.idx)}
+              className={`h-2.5 rounded-full transition-all cursor-pointer ${
+                currentPage === s.idx ? 'bg-slate-900 w-8' : 'bg-slate-300 hover:bg-slate-400 w-2.5'
+              }`}
+              title={s.title}
+            />
           ))}
         </div>
 
-        {/* Navigation & Print Controls */}
-        <div className="flex items-center gap-2">
-          <button
-            onClick={prevPage}
-            disabled={currentPage === 0}
-            className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 disabled:opacity-30 disabled:pointer-events-none transition-colors"
-            title="Previous Sheet"
-          >
-            <ChevronLeft size={18} />
-          </button>
-          <button
-            onClick={nextPage}
-            disabled={currentPage === totalPages - 1}
-            className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 disabled:opacity-30 disabled:pointer-events-none transition-colors"
-            title="Next Sheet"
-          >
-            <ChevronRight size={18} />
-          </button>
-          <button
-            onClick={handlePrint}
-            className="px-3 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-mono font-semibold flex items-center gap-1.5 transition-colors shadow-md"
-            title="Print or Export as PDF"
-          >
-            <Printer size={15} />
-            <span className="hidden sm:inline">Print / PDF</span>
-          </button>
-        </div>
       </div>
-
-      {/* The Presentation Sheet Canvas (Clean Architectural White Board / Landscape A3 Aspect Ratio) */}
-      <div className="relative w-full aspect-[16/10] sm:aspect-[1.414/1] bg-white text-slate-900 rounded-2xl shadow-2xl overflow-hidden border border-slate-300 select-none flex flex-col justify-between p-6 sm:p-10 font-sans print:shadow-none print:m-0 print:border-none print:w-full print:h-screen">
-        
-        {/* ============================================================ */}
-        {/* SHEET 1: COVER PAGE                                         */}
-        {/* ============================================================ */}
-        {currentPage === 0 && (
-          <div className="h-full flex flex-col justify-between animate-fadeIn">
-            {/* Top Sheet Header */}
-            <div className="flex items-center justify-between border-b-2 border-slate-900 pb-4">
-              <span className="text-xs font-mono uppercase tracking-widest text-slate-500 font-bold">
-                1. COVER PAGE &bull; SHEET 01
-              </span>
-              <span className="text-xs font-mono text-slate-600">
-                THE RIBHUS &bull; theribhus.com
-              </span>
-            </div>
-
-            {/* Cover Main Content Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center flex-1 my-6">
-              {/* Left Typography & Branding */}
-              <div className="md:col-span-6 space-y-6">
-                <div className="space-y-1">
-                  <span className="text-xs uppercase font-mono tracking-widest text-cyan-700 font-bold block">
-                    BIM ARCHITECTURAL &amp; ENERGY AUDIT PORTFOLIO
-                  </span>
-                  <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-none">
-                    THE RIBHUS
-                  </h1>
-                  <h2 className="text-xl sm:text-2xl font-bold text-slate-700 font-mono tracking-tight pt-1">
-                    BIM SPECIALIST &amp; ARCHITECT
-                  </h2>
-                </div>
-
-                <div className="w-20 h-1.5 bg-cyan-600"></div>
-
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-md">
-                  High-Precision Architectural 3D BIM Modeling (LOD 200–400) and 2D CAD to 3D Watertight Building Envelope Reconstruction for Energy Audits &amp; Heating Load Calculations (<span className="font-mono font-semibold text-slate-900">DIN EN 12831 / GEG 2024</span>).
-                </p>
-
-                {/* Contact Strip */}
-                <div className="pt-4 space-y-2 text-xs font-mono text-slate-700 border-t border-slate-200">
-                  <div className="flex items-center gap-2">
-                    <Mail size={14} className="text-cyan-700" />
-                    <span>contact@theribhus.com</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Globe size={14} className="text-cyan-700" />
-                    <span>https://theribhus.com</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Building2 size={14} className="text-cyan-700" />
-                    <span>Specialization: Architectural Modeling &amp; Energy Audits (No MEP)</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Hero Image (Angular Architectural Render Frame) */}
-              <div className="md:col-span-6 h-full flex items-center justify-center">
-                <div className="relative w-full h-[320px] sm:h-[400px] rounded-2xl overflow-hidden shadow-2xl border-4 border-slate-900 bg-slate-950 transform rotate-1 hover:rotate-0 transition-transform duration-500">
-                  <img
-                    src="assets/screenshots/ss4.png"
-                    alt="Erich Bracher Schule Campus Hero Render"
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent p-4 text-white">
-                    <div className="text-[11px] font-mono text-cyan-400 font-bold uppercase">
-                      LOD 400 Architectural Execution Model
-                    </div>
-                    <div className="text-sm font-bold">Erich Bracher Schule Complex</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Bottom Sheet Metadata Bar */}
-            <div className="border-t border-slate-300 pt-3 flex items-center justify-between text-[11px] font-mono text-slate-500">
-              <span>ArchiCAD 28 &bull; OpenBIM IFC4 &bull; DIN EN 12831</span>
-              <span>2024–2026 Selected Works</span>
-            </div>
-          </div>
-        )}
-
-        {/* ============================================================ */}
-        {/* SHEET 2: INTRODUCTION & SKILLS                              */}
-        {/* ============================================================ */}
-        {currentPage === 1 && (
-          <div className="h-full flex flex-col justify-between animate-fadeIn">
-            {/* Header */}
-            <div className="flex items-center justify-between border-b-2 border-slate-900 pb-3">
-              <span className="text-xs font-mono uppercase tracking-widest text-slate-500 font-bold">
-                2. INTRODUCTION &amp; SKILLS &bull; SHEET 02
-              </span>
-              <span className="text-xs font-mono text-slate-600">
-                THE RIBHUS &bull; theribhus.com
-              </span>
-            </div>
-
-            {/* Content Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 my-auto py-4">
-              {/* Left Column: About & Photo */}
-              <div className="md:col-span-5 space-y-4">
-                <div className="relative h-48 rounded-xl overflow-hidden shadow-md border border-slate-300">
-                  <img
-                    src="assets/screenshots/ss2.png"
-                    alt="August Borsig Str. 6 Konstanz"
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-slate-900/80 text-[10px] font-mono text-cyan-300">
-                    August Borsig Str. 6 &bull; LOD 350
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="text-lg font-black text-slate-900 uppercase tracking-tight">
-                    About The Ribhus
-                  </h3>
-                  <p className="text-xs text-slate-600 leading-relaxed mt-1">
-                    BIM architectural studio specialized in delivering high-precision ArchiCAD &amp; Revit models, construction documentation sets (LOD 200–400), and translating 2D CAD surveys into watertight thermal envelopes for German &amp; European building energy audits.
-                  </p>
-                </div>
-              </div>
-
-              {/* Right Column: Software Skills & Certifications */}
-              <div className="md:col-span-7 space-y-6">
-                {/* Software Skills */}
-                <div>
-                  <h3 className="text-xs uppercase font-mono tracking-wider font-bold text-slate-900 mb-3 flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 bg-cyan-600 rounded-sm"></span>
-                    Software Skills &amp; BIM Stack
-                  </h3>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="p-3 rounded-xl border border-slate-200 bg-slate-50">
-                      <div className="font-bold text-xs text-slate-900 flex items-center gap-2">
-                        <span className="w-5 h-5 rounded bg-blue-600 text-white flex items-center justify-center font-bold text-[10px]">A</span>
-                        <span>ArchiCAD (v26–28)</span>
-                      </div>
-                      <p className="text-[10px] text-slate-500 mt-1">3D modeling, GDL elements, composite assemblies, IFC mapping</p>
-                    </div>
-
-                    <div className="p-3 rounded-xl border border-slate-200 bg-slate-50">
-                      <div className="font-bold text-xs text-slate-900 flex items-center gap-2">
-                        <span className="w-5 h-5 rounded bg-blue-700 text-white flex items-center justify-center font-bold text-[10px]">R</span>
-                        <span>Autodesk Revit</span>
-                      </div>
-                      <p className="text-[10px] text-slate-500 mt-1">Architectural execution modeling, parametric families, schedules</p>
-                    </div>
-
-                    <div className="p-3 rounded-xl border border-slate-200 bg-slate-50">
-                      <div className="font-bold text-xs text-slate-900 flex items-center gap-2">
-                        <span className="w-5 h-5 rounded bg-amber-600 text-white flex items-center justify-center font-bold text-[10px]">E</span>
-                        <span>Solar-Computer &amp; Hottgenroth</span>
-                      </div>
-                      <p className="text-[10px] text-slate-500 mt-1">DIN EN 12831 heating load, GEG energy certificate geometry</p>
-                    </div>
-
-                    <div className="p-3 rounded-xl border border-slate-200 bg-slate-50">
-                      <div className="font-bold text-xs text-slate-900 flex items-center gap-2">
-                        <span className="w-5 h-5 rounded bg-emerald-600 text-white flex items-center justify-center font-bold text-[10px]">O</span>
-                        <span>OpenBIM IFC4 / 2x3</span>
-                      </div>
-                      <p className="text-[10px] text-slate-500 mt-1">Vendor-neutral coordination, classification &amp; property sets</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Certifications & Norms */}
-                <div>
-                  <h3 className="text-xs uppercase font-mono tracking-wider font-bold text-slate-900 mb-3 flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 bg-emerald-600 rounded-sm"></span>
-                    Regulatory Compliance &amp; Standards
-                  </h3>
-                  <div className="space-y-1.5 text-xs text-slate-700 font-mono">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle2 size={13} className="text-emerald-600" />
-                      <span><strong>DIN EN 12831-1:</strong> Room-by-room heating load calculation</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <CheckCircle2 size={13} className="text-emerald-600" />
-                      <span><strong>GEG 2024:</strong> Building Energy Act (Gebäudeenergiegesetz)</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <CheckCircle2 size={13} className="text-emerald-600" />
-                      <span><strong>DIN 277:2021:</strong> Areas &amp; Volumes (BGF, NRF, BRI takeoff)</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <CheckCircle2 size={13} className="text-emerald-600" />
-                      <span><strong>DIN 4108 Beiblatt 2:</strong> Thermal bridge mitigation modeling</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Bottom Bar */}
-            <div className="border-t border-slate-300 pt-3 flex items-center justify-between text-[11px] font-mono text-slate-500">
-              <span>BIM Architect Portfolio</span>
-              <span>Sheet 02 of 10</span>
-            </div>
-          </div>
-        )}
-
-        {/* ============================================================ */}
-        {/* SHEET 3: PROJECT 1 – OVERVIEW                               */}
-        {/* ============================================================ */}
-        {currentPage === 2 && (
-          <div className="h-full flex flex-col justify-between animate-fadeIn">
-            {/* Header */}
-            <div className="flex items-center justify-between border-b-2 border-slate-900 pb-3">
-              <span className="text-xs font-mono uppercase tracking-widest text-slate-500 font-bold">
-                3. PROJECT 1 &bull; PROJECT OVERVIEW &bull; SHEET 03
-              </span>
-              <span className="text-xs font-mono text-slate-600">
-                Erich Bracher Schule Campus
-              </span>
-            </div>
-
-            {/* Main Project Overview Layout */}
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 my-auto py-4 items-center">
-              {/* Left Column: Metadata & Technical Scope */}
-              <div className="md:col-span-5 space-y-4">
-                <div>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-100 text-cyan-800 border border-cyan-300">
-                    LOD 400 PRODUCTION
-                  </span>
-                  <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mt-1">
-                    Erich Bracher Schule
-                  </h2>
-                  <p className="text-xs font-mono text-slate-500">Educational Campus Complex &bull; 2025</p>
-                </div>
-
-                {/* Metadata Table */}
-                <div className="space-y-1.5 font-mono text-xs border-y border-slate-200 py-3">
-                  <div className="flex justify-between text-slate-600">
-                    <span>Project Type:</span>
-                    <span className="font-bold text-slate-900">Educational &amp; Gymnasium</span>
-                  </div>
-                  <div className="flex justify-between text-slate-600">
-                    <span>Location:</span>
-                    <span className="font-bold text-slate-900">Baden-Württemberg, Germany</span>
-                  </div>
-                  <div className="flex justify-between text-slate-600">
-                    <span>Gross Floor Area (BGF):</span>
-                    <span className="font-bold text-cyan-700">8,800 m²</span>
-                  </div>
-                  <div className="flex justify-between text-slate-600">
-                    <span>Gross Volume (Ve):</span>
-                    <span className="font-bold text-emerald-700">36,400 m³</span>
-                  </div>
-                  <div className="flex justify-between text-slate-600">
-                    <span>Scale:</span>
-                    <span className="font-bold text-slate-900">4 Levels (G+3 Floors)</span>
-                  </div>
-                  <div className="flex justify-between text-slate-600">
-                    <span>My Role:</span>
-                    <span className="font-bold text-slate-900">Lead Architectural BIM Modeler</span>
-                  </div>
-                  <div className="flex justify-between text-slate-600">
-                    <span>BIM Tools Used:</span>
-                    <span className="font-bold text-slate-900">ArchiCAD 28, OpenBIM</span>
-                  </div>
-                </div>
-
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  Execution-level LOD 400 architectural modeling for a public vocational school complex. Coordinated acoustic wall partitions, concrete structural slab levels, curtain wall facades, and life-safety egress layouts.
-                </p>
-              </div>
-
-              {/* Right Column: Large Building Render */}
-              <div className="md:col-span-7 h-full flex items-center justify-center">
-                <div className="relative w-full h-[320px] sm:h-[380px] rounded-2xl overflow-hidden shadow-xl border border-slate-300 bg-slate-950">
-                  <img
-                    src="assets/screenshots/ss4.png"
-                    alt="Erich Bracher Schule 3D Perspective"
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute top-3 right-3 px-2.5 py-1 rounded bg-slate-900/85 text-cyan-300 font-mono text-[10px] border border-cyan-500/30">
-                    ArchiCAD 3D Model Viewport
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Bottom Bar */}
-            <div className="border-t border-slate-300 pt-3 flex items-center justify-between text-[11px] font-mono text-slate-500">
-              <span>Project 01 &bull; Erich Bracher Schule</span>
-              <span>Sheet 03 of 10</span>
-            </div>
-          </div>
-        )}
-
-        {/* ============================================================ */}
-        {/* SHEET 4: PROJECT 1 – MODEL ORGANISATION & PROCESS           */}
-        {/* ============================================================ */}
-        {currentPage === 3 && (
-          <div className="h-full flex flex-col justify-between animate-fadeIn">
-            {/* Header */}
-            <div className="flex items-center justify-between border-b-2 border-slate-900 pb-3">
-              <span className="text-xs font-mono uppercase tracking-widest text-slate-500 font-bold">
-                3. PROJECT 1 &bull; MODEL ORGANISATION &amp; PROCESS &bull; SHEET 04
-              </span>
-              <span className="text-xs font-mono text-slate-600">
-                Erich Bracher Schule
-              </span>
-            </div>
-
-            {/* Content Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 my-auto py-4 items-center">
-              {/* Left Column: Project Browser & Hierarchy */}
-              <div className="md:col-span-5 space-y-4">
-                <h3 className="text-sm uppercase font-mono tracking-wider font-bold text-slate-900">
-                  Model Organisation &amp; Layers
-                </h3>
-
-                {/* ArchiCAD / Revit Project Browser Tree Visual */}
-                <div className="p-4 rounded-xl border border-slate-200 bg-slate-50 font-mono text-xs space-y-2">
-                  <div className="text-slate-500 text-[10px] uppercase tracking-wider font-bold">
-                    Project Browser / Hierarchy
-                  </div>
-                  <div className="space-y-1.5 text-[11px] text-slate-700">
-                    <div className="font-bold text-slate-900 flex items-center gap-1.5">
-                      <span>📁 Erich_Bracher_Schule.pln</span>
-                    </div>
-                    <div className="pl-4 space-y-1 text-slate-600">
-                      <div>├─ 🏢 00. Fundament / Base (-3.20m)</div>
-                      <div>├─ 🏢 01. Erdgeschoss (EG 0.00m)</div>
-                      <div>├─ 🏢 02. Obergeschoss (1.OG +3.60m)</div>
-                      <div>├─ 🏢 03. Obergeschoss (2.OG +7.20m)</div>
-                      <div>└─ 🏢 04. Dachgeschoss (DG +10.80m)</div>
-                    </div>
-                    <div className="pt-2 border-t border-slate-200 font-bold text-slate-900">
-                      <span>📁 Classification &amp; Disciplines</span>
-                    </div>
-                    <div className="pl-4 space-y-1 text-slate-600">
-                      <div>├─ 🧱 Exterior Thermal Walls (5,400 m²)</div>
-                      <div>├─ 🏗️ Concrete Structural Slabs (8,500 m²)</div>
-                      <div>├─ 🪟 Curtain Wall Glazing (1,280 m²)</div>
-                      <div>└─ 🚪 Doors &amp; Egress Openings (194 units)</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* BIM Workflow Steps */}
-                <div className="space-y-1 pt-1">
-                  <span className="text-[10px] font-mono uppercase text-slate-400 font-bold block">
-                    BIM Workflow Pipeline
-                  </span>
-                  <div className="grid grid-cols-4 gap-1 text-[10px] font-mono text-center">
-                    <div className="p-1.5 rounded bg-cyan-50 border border-cyan-200 text-cyan-800 font-bold">1. Setup</div>
-                    <div className="p-1.5 rounded bg-cyan-50 border border-cyan-200 text-cyan-800 font-bold">2. Model</div>
-                    <div className="p-1.5 rounded bg-cyan-50 border border-cyan-200 text-cyan-800 font-bold">3. Coordinate</div>
-                    <div className="p-1.5 rounded bg-cyan-50 border border-cyan-200 text-cyan-800 font-bold">4. Document</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Column: 3D Exploded Axonometric Model */}
-              <div className="md:col-span-7 h-full flex items-center justify-center">
-                <div className="relative w-full h-[320px] sm:h-[400px] rounded-2xl overflow-hidden shadow-lg border border-slate-300 bg-white p-2">
-                  <img
-                    src="assets/drawings/axonometric_exploded.jpg"
-                    alt="3D Architectural Exploded Axonometric BIM Model"
-                    className="w-full h-full object-contain"
-                  />
-                  <div className="absolute top-4 left-4 px-2 py-0.5 rounded bg-slate-900/80 text-[10px] font-mono text-cyan-300">
-                    3D Exploded Axonometric View
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Bottom Bar */}
-            <div className="border-t border-slate-300 pt-3 flex items-center justify-between text-[11px] font-mono text-slate-500">
-              <span>Model Organisation &amp; 3D Axonometric Disassembly</span>
-              <span>Sheet 04 of 10</span>
-            </div>
-          </div>
-        )}
-
-        {/* ============================================================ */}
-        {/* SHEET 5: PROJECT 1 – DRAWING OUTPUT (PLAN, SECTION, ELEVATION) */}
-        {/* ============================================================ */}
-        {currentPage === 4 && (
-          <div className="h-full flex flex-col justify-between animate-fadeIn">
-            {/* Header */}
-            <div className="flex items-center justify-between border-b-2 border-slate-900 pb-3">
-              <span className="text-xs font-mono uppercase tracking-widest text-slate-500 font-bold">
-                3. PROJECT 1 &bull; DRAWING OUTPUT (2D CD SETS) &bull; SHEET 05
-              </span>
-              <span className="text-xs font-mono text-slate-600">
-                Ground Floor Plan &bull; Section A-A &bull; North Elevation
-              </span>
-            </div>
-
-            {/* Drawing Output 3-Box Architectural Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-4 my-auto py-2 flex-1 items-center">
-              {/* Top Left: Ground Floor Plan */}
-              <div className="md:col-span-6 h-[190px] sm:h-[220px] rounded-xl overflow-hidden border border-slate-300 bg-white shadow-sm p-1 flex flex-col justify-between">
-                <div className="h-[85%] w-full overflow-hidden">
-                  <img
-                    src="assets/drawings/floor_plan.jpg"
-                    alt="Ground Floor Plan Drawing"
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-                <div className="px-2 py-1 bg-slate-100 text-[10px] font-mono text-slate-700 flex justify-between">
-                  <span className="font-bold">GROUND FLOOR PLAN</span>
-                  <span>SCALE 1:100 @ A2</span>
-                </div>
-              </div>
-
-              {/* Top Right: Section A-A */}
-              <div className="md:col-span-6 h-[190px] sm:h-[220px] rounded-xl overflow-hidden border border-slate-300 bg-white shadow-sm p-1 flex flex-col justify-between">
-                <div className="h-[85%] w-full overflow-hidden">
-                  <img
-                    src="assets/drawings/section_drawing.jpg"
-                    alt="Building Section A-A Drawing"
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-                <div className="px-2 py-1 bg-slate-100 text-[10px] font-mono text-slate-700 flex justify-between">
-                  <span className="font-bold">BUILDING SECTION A-A</span>
-                  <span>SCALE 1:100</span>
-                </div>
-              </div>
-
-              {/* Bottom Left: North Elevation */}
-              <div className="md:col-span-7 h-[160px] sm:h-[180px] rounded-xl overflow-hidden border border-slate-300 bg-white shadow-sm p-1 flex flex-col justify-between">
-                <div className="h-[82%] w-full overflow-hidden">
-                  <img
-                    src="assets/drawings/elevation_drawing.jpg"
-                    alt="North Elevation Drawing"
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-                <div className="px-2 py-1 bg-slate-100 text-[10px] font-mono text-slate-700 flex justify-between">
-                  <span className="font-bold">NORTH FACADE ELEVATION</span>
-                  <span>SCALE 1:100</span>
-                </div>
-              </div>
-
-              {/* Bottom Right: Door & Window Schedule / Raumbuch Table */}
-              <div className="md:col-span-5 h-[160px] sm:h-[180px] rounded-xl overflow-hidden border border-slate-200 bg-slate-50 p-2.5 flex flex-col justify-between font-mono text-[10px]">
-                <div className="font-bold text-slate-900 border-b border-slate-200 pb-1 flex justify-between">
-                  <span>ROOM &amp; MASS SCHEDULE (DIN 277)</span>
-                  <span className="text-cyan-700">EXTRACTED</span>
-                </div>
-                <div className="space-y-1 overflow-y-auto text-slate-700 pr-1">
-                  <div className="flex justify-between py-0.5 border-b border-slate-200">
-                    <span>Living / Foyer Area</span>
-                    <span className="font-bold">44.2 m²</span>
-                  </div>
-                  <div className="flex justify-between py-0.5 border-b border-slate-200">
-                    <span>Kitchen &amp; Dining</span>
-                    <span className="font-bold">25.0 m²</span>
-                  </div>
-                  <div className="flex justify-between py-0.5 border-b border-slate-200">
-                    <span>Master Bedroom Suite</span>
-                    <span className="font-bold">18.0 m²</span>
-                  </div>
-                  <div className="flex justify-between py-0.5 border-b border-slate-200">
-                    <span>Total Net Room Area (NRF)</span>
-                    <span className="font-bold text-emerald-700">7,350 m²</span>
-                  </div>
-                </div>
-                <div className="text-[9px] text-slate-400 text-right">Automated ArchiCAD Schedule</div>
-              </div>
-            </div>
-
-            {/* Bottom Bar */}
-            <div className="border-t border-slate-300 pt-3 flex items-center justify-between text-[11px] font-mono text-slate-500">
-              <span>Architectural Construction Documents Output</span>
-              <span>Sheet 05 of 10</span>
-            </div>
-          </div>
-        )}
-
-        {/* ============================================================ */}
-        {/* SHEET 6: PROJECT 1 – ENERGY AUDIT & CLASH COORDINATION      */}
-        {/* ============================================================ */}
-        {currentPage === 5 && (
-          <div className="h-full flex flex-col justify-between animate-fadeIn">
-            {/* Header */}
-            <div className="flex items-center justify-between border-b-2 border-slate-900 pb-3">
-              <span className="text-xs font-mono uppercase tracking-widest text-slate-500 font-bold">
-                3. PROJECT 1 &bull; 2D-TO-3D ENERGY AUDIT &amp; HEATING LOAD &bull; SHEET 06
-              </span>
-              <span className="text-xs font-mono text-slate-600">
-                DIN EN 12831 &bull; GEG 2024
-              </span>
-            </div>
-
-            {/* Content Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 my-auto py-3 items-center">
-              {/* Left Column: Energy Audit Comparison Graphic */}
-              <div className="md:col-span-7 h-full flex items-center justify-center">
-                <div className="relative w-full h-[320px] sm:h-[400px] rounded-2xl overflow-hidden shadow-lg border border-slate-300 bg-white p-2">
-                  <img
-                    src="assets/drawings/energy_audit_comparison.jpg"
-                    alt="2D CAD to 3D BIM Energy Audit Comparison"
-                    className="w-full h-full object-contain"
-                  />
-                  <div className="absolute top-4 left-4 px-2 py-0.5 rounded bg-amber-950/80 text-[10px] font-mono text-amber-300 border border-amber-500/40">
-                    2D Blueprint &rarr; 3D Thermal Zone Model
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Column: Thermal Heat Loss Table & Resolution */}
-              <div className="md:col-span-5 space-y-4 font-mono text-xs">
-                <div>
-                  <span className="px-2 py-0.5 rounded text-[10px] bg-emerald-100 text-emerald-800 font-bold">
-                    WATERTIGHT ENVELOPE VERIFIED
-                  </span>
-                  <h3 className="text-lg font-black text-slate-900 font-sans mt-1">
-                    Heating Load &amp; Thermal Takeoff
-                  </h3>
-                  <p className="text-xs text-slate-600 font-sans mt-1">
-                    Resolution of thermal gaps between 2D historical drawings and on-site geometry, resulting in an audited 3D thermal hull.
-                  </p>
-                </div>
-
-                {/* Heat Loss Table */}
-                <div className="border border-slate-200 rounded-xl overflow-hidden bg-slate-50 p-3 space-y-2">
-                  <div className="font-bold text-[11px] text-slate-900 border-b border-slate-200 pb-1 flex justify-between">
-                    <span>Component</span>
-                    <span>U-Value (W/m²K)</span>
-                  </div>
-                  <div className="space-y-1.5 text-[11px] text-slate-700">
-                    <div className="flex justify-between">
-                      <span>Exterior Wall (WDVS)</span>
-                      <span className="text-emerald-700 font-bold">0.18 W/m²K</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Triple Glazing (Ug)</span>
-                      <span className="text-cyan-700 font-bold">0.65 W/m²K</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Roof Thermal Package</span>
-                      <span className="text-emerald-700 font-bold">0.14 W/m²K</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Ground Slab Insulation</span>
-                      <span className="text-slate-900 font-bold">0.22 W/m²K</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="p-3 rounded-xl bg-cyan-50 border border-cyan-200 text-cyan-900 text-xs font-sans space-y-1">
-                  <div className="font-bold flex items-center gap-1.5">
-                    <CheckCircle2 size={14} className="text-cyan-700" />
-                    <span>Resolution Summary:</span>
-                  </div>
-                  <p className="text-[11px] text-cyan-800 leading-snug">
-                    Watertight volume seal verified: A/Ve ratio calibrated at 0.24 m⁻¹. Direct export to Solar-Computer &amp; Hottgenroth with zero geometric polyloop errors.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Bottom Bar */}
-            <div className="border-t border-slate-300 pt-3 flex items-center justify-between text-[11px] font-mono text-slate-500">
-              <span>Thermal Zone Modeling &amp; Energy Audit Compliance</span>
-              <span>Sheet 06 of 10</span>
-            </div>
-          </div>
-        )}
-
-        {/* ============================================================ */}
-        {/* SHEET 7: PROJECT 2 – AUGUST BORSIG STR. 6 (COMMERCIAL)       */}
-        {/* ============================================================ */}
-        {currentPage === 6 && (
-          <div className="h-full flex flex-col justify-between animate-fadeIn">
-            {/* Header */}
-            <div className="flex items-center justify-between border-b-2 border-slate-900 pb-3">
-              <span className="text-xs font-mono uppercase tracking-widest text-slate-500 font-bold">
-                4. PROJECT 2 &bull; COMMERCIAL INNOVATION &bull; SHEET 07
-              </span>
-              <span className="text-xs font-mono text-slate-600">
-                August Borsig Str. 6, Konstanz
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 my-auto py-4 items-center">
-              <div className="md:col-span-5 space-y-4">
-                <div>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-100 text-cyan-800 border border-cyan-300">
-                    LOD 350 PRECHECK &amp; FACADE
-                  </span>
-                  <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mt-1">
-                    August Borsig Str. 6
-                  </h2>
-                  <p className="text-xs font-mono text-slate-500">Commercial &bull; 6,450 m² &bull; Konstanz</p>
-                </div>
-
-                <div className="space-y-1.5 font-mono text-xs border-y border-slate-200 py-3 text-slate-600">
-                  <div className="flex justify-between">
-                    <span>Gross Volume (Ve):</span>
-                    <span className="font-bold text-slate-900">22,100 m³</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Curtain Facade Glazing:</span>
-                    <span className="font-bold text-cyan-700">1,940 m²</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Window-to-Wall Ratio:</span>
-                    <span className="font-bold text-slate-900">36.0%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>File Formats:</span>
-                    <span className="font-bold text-emerald-700">.ifc (10MB), .pln (72MB)</span>
-                  </div>
-                </div>
-
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  LOD 350 architectural execution and double-skin curtain wall coordination. Detailed parametric modeling of aluminium transom-mullion profiles, solar shading fins, and interior column grids.
-                </p>
-              </div>
-
-              <div className="md:col-span-7 h-full flex items-center justify-center">
-                <div className="relative w-full h-[320px] sm:h-[380px] rounded-2xl overflow-hidden shadow-xl border border-slate-300 bg-slate-950">
-                  <img
-                    src="assets/screenshots/ss2.png"
-                    alt="August Borsig Str. 6 Real Screenshot"
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute top-3 left-3 px-2.5 py-1 rounded bg-slate-900/85 text-cyan-300 font-mono text-[10px]">
-                    Real ArchiCAD 3D Model Viewport
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="border-t border-slate-300 pt-3 flex items-center justify-between text-[11px] font-mono text-slate-500">
-              <span>Project 02 &bull; Commercial Administration</span>
-              <span>Sheet 07 of 10</span>
-            </div>
-          </div>
-        )}
-
-        {/* ============================================================ */}
-        {/* SHEET 8: PROJECT 3 – BILDHUUUSER HOF (ENERGY AUDIT)         */}
-        {/* ============================================================ */}
-        {currentPage === 7 && (
-          <div className="h-full flex flex-col justify-between animate-fadeIn">
-            {/* Header */}
-            <div className="flex items-center justify-between border-b-2 border-slate-900 pb-3">
-              <span className="text-xs font-mono uppercase tracking-widest text-slate-500 font-bold">
-                5. PROJECT 3 &bull; HEIZLASTBERECHNUNG &bull; SHEET 08
-              </span>
-              <span className="text-xs font-mono text-slate-600">
-                Bildhauuser Hof Estate
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 my-auto py-4 items-center">
-              <div className="md:col-span-5 space-y-4">
-                <div>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-100 text-amber-800 border border-amber-300">
-                    2D-TO-3D ENERGY AUDIT
-                  </span>
-                  <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mt-1">
-                    Bildhauuser Hof
-                  </h2>
-                  <p className="text-xs font-mono text-slate-500">Historic Refurbishment &bull; DIN EN 12831</p>
-                </div>
-
-                <div className="space-y-1.5 font-mono text-xs border-y border-slate-200 py-3 text-slate-600">
-                  <div className="flex justify-between">
-                    <span>Gross Floor Area (BGF):</span>
-                    <span className="font-bold text-slate-900">2,840 m²</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Thermal Envelope Vol (Ve):</span>
-                    <span className="font-bold text-emerald-700">8,420 m³</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>A/Ve Ratio:</span>
-                    <span className="font-bold text-amber-700">0.38 m⁻¹</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Thermal Zones:</span>
-                    <span className="font-bold text-slate-900">46 Heated Rooms</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Model File:</span>
-                    <span className="font-bold text-slate-900">Heizlastberechnung-Bildhauuser-Hof.pln</span>
-                  </div>
-                </div>
-
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  2D-to-3D reconstruction of historic 19th-century estate from faded archive blueprints into watertight 3D thermal boundary geometry. Extracted room schedules and U-values for energetic subsidy appraisal.
-                </p>
-              </div>
-
-              <div className="md:col-span-7 h-full flex items-center justify-center">
-                <div className="relative w-full h-[320px] sm:h-[380px] rounded-2xl overflow-hidden shadow-xl border border-slate-300 bg-slate-950">
-                  <img
-                    src="assets/screenshots/ss8.png"
-                    alt="Bildhauuser Hof Real Screenshot"
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute top-3 left-3 px-2.5 py-1 rounded bg-slate-900/85 text-amber-300 font-mono text-[10px]">
-                    Real ArchiCAD Heizlastberechnung Model
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="border-t border-slate-300 pt-3 flex items-center justify-between text-[11px] font-mono text-slate-500">
-              <span>Project 03 &bull; Heating Load Calculation (Heizlast)</span>
-              <span>Sheet 08 of 10</span>
-            </div>
-          </div>
-        )}
-
-        {/* ============================================================ */}
-        {/* SHEET 9: PROJECT 3 – RAUMBUCH & U-VALUES                     */}
-        {/* ============================================================ */}
-        {currentPage === 8 && (
-          <div className="h-full flex flex-col justify-between animate-fadeIn">
-            {/* Header */}
-            <div className="flex items-center justify-between border-b-2 border-slate-900 pb-3">
-              <span className="text-xs font-mono uppercase tracking-widest text-slate-500 font-bold">
-                5. PROJECT 3 &bull; RAUMBUCH &amp; THERMAL MATRIX &bull; SHEET 09
-              </span>
-              <span className="text-xs font-mono text-slate-600">
-                Bildhauuser Hof &bull; DIN EN 12831 Room Book
-              </span>
-            </div>
-
-            <div className="my-auto py-4 space-y-6">
-              <div>
-                <h3 className="text-base font-black text-slate-900 uppercase font-mono">
-                  Automated Raumbuch (Room Schedule per DIN EN 12831)
-                </h3>
-                <p className="text-xs text-slate-600">
-                  Generated directly from ArchiCAD thermal zone geometry, providing net heated volume, floor area, design indoor temperatures, and transmission heat loss parameters.
-                </p>
-              </div>
-
-              <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-                <table className="w-full text-left font-mono text-xs">
-                  <thead className="bg-slate-900 text-white text-[11px]">
-                    <tr>
-                      <th className="p-3">Room ID</th>
-                      <th className="p-3">Designation</th>
-                      <th className="p-3">Floor Area</th>
-                      <th className="p-3">Height</th>
-                      <th className="p-3">Net Volume</th>
-                      <th className="p-3">Design Temp</th>
-                      <th className="p-3">Heat Loss HT</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-200 text-slate-700 text-[11px] bg-slate-50">
-                    <tr>
-                      <td className="p-2.5 font-bold text-cyan-800">EG-01</td>
-                      <td className="p-2.5">Living / Dining Suite</td>
-                      <td className="p-2.5">45.2 m²</td>
-                      <td className="p-2.5">3.10 m</td>
-                      <td className="p-2.5">140.1 m³</td>
-                      <td className="p-2.5 text-slate-900 font-semibold">+20°C</td>
-                      <td className="p-2.5 text-emerald-700 font-bold">2.1 kW</td>
-                    </tr>
-                    <tr>
-                      <td className="p-2.5 font-bold text-cyan-800">EG-02</td>
-                      <td className="p-2.5">Kitchen &amp; Pantry</td>
-                      <td className="p-2.5">25.0 m²</td>
-                      <td className="p-2.5">3.10 m</td>
-                      <td className="p-2.5">77.5 m³</td>
-                      <td className="p-2.5 text-slate-900 font-semibold">+20°C</td>
-                      <td className="p-2.5 text-emerald-700 font-bold">1.3 kW</td>
-                    </tr>
-                    <tr>
-                      <td className="p-2.5 font-bold text-cyan-800">1OG-01</td>
-                      <td className="p-2.5">Master Bedroom</td>
-                      <td className="p-2.5">18.0 m²</td>
-                      <td className="p-2.5">2.90 m</td>
-                      <td className="p-2.5">52.2 m³</td>
-                      <td className="p-2.5 text-slate-900 font-semibold">+20°C</td>
-                      <td className="p-2.5 text-emerald-700 font-bold">0.9 kW</td>
-                    </tr>
-                    <tr>
-                      <td className="p-2.5 font-bold text-cyan-800">1OG-02</td>
-                      <td className="p-2.5">Bathroom &amp; Sanitary</td>
-                      <td className="p-2.5">11.5 m²</td>
-                      <td className="p-2.5">2.90 m</td>
-                      <td className="p-2.5">33.3 m³</td>
-                      <td className="p-2.5 text-rose-700 font-bold">+24°C</td>
-                      <td className="p-2.5 text-amber-700 font-bold">1.1 kW</td>
-                    </tr>
-                    <tr className="bg-slate-100 font-bold text-slate-900">
-                      <td className="p-2.5" colSpan={2}>Total Heated Envelope (46 Rooms)</td>
-                      <td className="p-2.5">2,290 m²</td>
-                      <td className="p-2.5">—</td>
-                      <td className="p-2.5 text-emerald-800">8,420 m³</td>
-                      <td className="p-2.5">—</td>
-                      <td className="p-2.5 text-emerald-800">42.8 kW</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <div className="border-t border-slate-300 pt-3 flex items-center justify-between text-[11px] font-mono text-slate-500">
-              <span>Raumbuch &bull; Automated Area &amp; Volume Takeoffs</span>
-              <span>Sheet 09 of 10</span>
-            </div>
-          </div>
-        )}
-
-        {/* ============================================================ */}
-        {/* SHEET 10: CONTACT PAGE (LET'S CONNECT)                      */}
-        {/* ============================================================ */}
-        {currentPage === 9 && (
-          <div className="h-full flex flex-col justify-between animate-fadeIn">
-            {/* Header */}
-            <div className="flex items-center justify-between border-b-2 border-slate-900 pb-3">
-              <span className="text-xs font-mono uppercase tracking-widest text-slate-500 font-bold">
-                6. CONTACT PAGE &bull; SHEET 10
-              </span>
-              <span className="text-xs font-mono text-slate-600">
-                THE RIBHUS &bull; theribhus.com
-              </span>
-            </div>
-
-            {/* Content Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 my-auto py-6 items-center">
-              {/* Left Column: Let's Connect Info */}
-              <div className="md:col-span-6 space-y-6">
-                <div>
-                  <span className="text-xs font-mono uppercase tracking-widest text-cyan-700 font-bold block">
-                    PROJECT INQUIRIES &amp; COLLABORATION
-                  </span>
-                  <h2 className="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight mt-1">
-                    LET'S CONNECT
-                  </h2>
-                  <div className="w-16 h-1.5 bg-cyan-600 mt-2"></div>
-                </div>
-
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-md">
-                  Looking for a dedicated BIM partner for architectural modeling (LOD 200–400) or converting 2D legacy blueprints into simulation-ready energy audit models? Get in touch with The Ribhus team.
-                </p>
-
-                <div className="space-y-3 font-mono text-xs text-slate-800 border-t border-slate-200 pt-4">
-                  <div className="flex items-center gap-3">
-                    <span className="w-8 h-8 rounded-lg bg-cyan-50 border border-cyan-200 flex items-center justify-center text-cyan-700 font-bold">@</span>
-                    <div>
-                      <span className="text-slate-400 block text-[10px]">DIRECT EMAIL</span>
-                      <a href="mailto:contact@theribhus.com" className="font-bold text-slate-900 hover:text-cyan-700">contact@theribhus.com</a>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <span className="w-8 h-8 rounded-lg bg-cyan-50 border border-cyan-200 flex items-center justify-center text-cyan-700 font-bold">🌐</span>
-                    <div>
-                      <span className="text-slate-400 block text-[10px]">WEBSITE</span>
-                      <a href="https://theribhus.com" target="_blank" rel="noopener noreferrer" className="font-bold text-slate-900 hover:text-cyan-700">theribhus.com</a>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <span className="w-8 h-8 rounded-lg bg-cyan-50 border border-cyan-200 flex items-center justify-center text-cyan-700 font-bold">📍</span>
-                    <div>
-                      <span className="text-slate-400 block text-[10px]">STUDIO LOCATION</span>
-                      <span className="font-bold text-slate-900">New Delhi &bull; Serving European &amp; Global Clients</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Column: Architectural Sketch / Wireframe Building */}
-              <div className="md:col-span-6 h-full flex items-center justify-center">
-                <div className="relative w-full h-[320px] sm:h-[380px] rounded-2xl overflow-hidden shadow-xl border border-slate-300 bg-slate-950 p-2">
-                  <img
-                    src="assets/screenshots/ss13.png"
-                    alt="BB Decker Bornheim Architectural Model"
-                    className="w-full h-full object-cover rounded-xl"
-                  />
-                  <div className="absolute bottom-4 left-4 right-4 p-3 bg-slate-950/85 backdrop-blur-md rounded-xl text-white font-mono text-[11px]">
-                    <span className="text-cyan-400 font-bold">The Ribhus Extended BIM Pods</span> &bull; Fast, Accurate, Compliant
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Bottom Bar */}
-            <div className="border-t border-slate-300 pt-3 flex items-center justify-between text-[11px] font-mono text-slate-500">
-              <span>The Ribhus &copy; {new Date().getFullYear()}</span>
-              <span>Sheet 10 of 10 &bull; End of Portfolio</span>
-            </div>
-          </div>
-        )}
-
-      </div>
-
-      {/* Sheet Thumbnails Navigator Bar */}
-      <div className="flex items-center justify-center gap-2 pt-2">
-        {Array.from({ length: totalPages }).map((_, idx) => (
-          <button
-            key={idx}
-            onClick={() => setCurrentPage(idx)}
-            className={`w-3 h-3 rounded-full transition-all ${
-              currentPage === idx ? 'bg-cyan-400 w-8' : 'bg-slate-700 hover:bg-slate-500'
-            }`}
-            title={`Go to Sheet ${idx + 1}`}
-          />
-        ))}
-      </div>
-    </div>
+    </section>
   );
 }

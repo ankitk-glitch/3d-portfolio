@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Layers, Phone, Menu, X, ArrowUpRight, Flame } from 'lucide-react';
+import { Box, Layers, Menu, X, ArrowUpRight, Clock, FileCheck } from 'lucide-react';
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -14,94 +14,93 @@ export default function Navbar() {
   }, []);
 
   const navLinks = [
-    { label: 'Portfolio (22 Models)', href: '#portfolio' },
-    { label: '3D BIM Studio', href: '#studio' },
-    { label: '2D-to-3D Energy Audit', href: '#energy-workflow' },
-    { label: 'Capabilities', href: '#capabilities' },
-    { label: 'Standards', href: '#standards' },
+    { label: 'Portfolio Sheets', href: '#portfolio-deck' },
+    { label: 'Model Showcase', href: '#showcase' },
+    { label: 'Pricing (€180+)', href: '#pricing' },
+    { label: 'Requirement Form', href: '#request-form' },
   ];
 
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? 'bg-slate-950/90 backdrop-blur-xl border-b border-slate-800/80 shadow-2xl py-3'
-          : 'bg-transparent py-5'
+          ? 'bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm py-3'
+          : 'bg-white/80 backdrop-blur-sm border-b border-slate-100 py-4'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         {/* Logo */}
         <a href="#" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-700 flex items-center justify-center p-0.5 shadow-lg shadow-cyan-500/20 group-hover:shadow-cyan-500/40 transition-all">
-            <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
-              <Box size={20} className="text-cyan-400 group-hover:rotate-12 transition-transform duration-300" />
-            </div>
+          <div className="w-9 h-9 rounded-lg bg-slate-900 flex items-center justify-center text-white shadow-md group-hover:bg-cyan-600 transition-colors">
+            <Box size={20} />
           </div>
           <div>
-            <div className="font-extrabold text-base tracking-tight text-white flex items-center gap-1">
+            <div className="font-extrabold text-base tracking-tight text-slate-900 flex items-center gap-1.5">
               THE RIBHUS
-              <span className="text-cyan-400 text-xs px-1.5 py-0.2 rounded bg-cyan-950/80 border border-cyan-800/50 font-mono">BIM</span>
+              <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-300">
+                BIM STUDIO
+              </span>
             </div>
-            <div className="text-[10px] font-mono text-slate-400 tracking-wider">
-              theribhus.com &bull; 3D Modeling Portfolio
+            <div className="text-[10px] font-mono text-slate-500">
+              theribhus.com &bull; European Architectural 3D Modeling
             </div>
           </div>
         </a>
 
         {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center gap-7 text-xs font-medium text-slate-300">
+        <nav className="hidden md:flex items-center gap-8 text-xs font-semibold text-slate-700">
           {navLinks.map((link) => (
             <a
               key={link.label}
               href={link.href}
-              className="hover:text-cyan-400 transition-colors tracking-wide py-1 relative after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-cyan-400 after:scale-x-0 hover:after:scale-x-100 after:transition-transform"
+              className="hover:text-cyan-600 transition-colors tracking-wide"
             >
               {link.label}
             </a>
           ))}
         </nav>
 
-        {/* CTA Button */}
+        {/* Right CTA */}
         <div className="hidden sm:flex items-center gap-3">
           <a
-            href="#estimate"
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:scale-[1.02] transition-all"
+            href="#request-form"
+            className="px-4 py-2 rounded-lg text-xs font-bold font-mono bg-slate-900 hover:bg-cyan-700 text-white shadow-sm flex items-center gap-1.5 transition-all"
           >
-            <span>Request Audit Model</span>
-            <ArrowUpRight size={14} />
+            <span>Request Model (€180+)</span>
+            <ArrowUpRight size={13} />
           </a>
         </div>
 
         {/* Mobile Hamburger */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="lg:hidden p-2 text-slate-300 hover:text-white rounded-lg hover:bg-slate-900"
+          className="md:hidden p-2 text-slate-700 hover:text-slate-900 rounded-lg hover:bg-slate-100"
           aria-label="Toggle menu"
         >
-          {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+          {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
       </div>
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-slate-950/95 backdrop-blur-2xl border-b border-slate-800 px-6 py-5 space-y-3">
+        <div className="md:hidden bg-white border-b border-slate-200 px-6 py-4 space-y-3 shadow-lg">
           {navLinks.map((link) => (
             <a
               key={link.label}
               href={link.href}
               onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 text-sm text-slate-200 hover:text-cyan-400 font-medium border-b border-slate-900"
+              className="block py-2 text-sm text-slate-800 hover:text-cyan-600 font-semibold border-b border-slate-100"
             >
               {link.label}
             </a>
           ))}
           <div className="pt-2">
             <a
-              href="#estimate"
+              href="#request-form"
               onClick={() => setMobileMenuOpen(false)}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-xs font-semibold bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg"
+              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-xs font-bold font-mono bg-slate-900 text-white"
             >
-              <span>Request Audit Model</span>
+              <span>Request Model (€180+)</span>
               <ArrowUpRight size={14} />
             </a>
           </div>
