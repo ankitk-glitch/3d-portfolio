@@ -7,22 +7,24 @@ from pptx.enum.shapes import MSO_SHAPE
 
 def create_presentation():
     prs = Presentation()
-    # 16:9 widescreen
+    # 16:9 widescreen format
     prs.slide_width = Inches(13.333)
     prs.slide_height = Inches(7.5)
     blank_layout = prs.slide_layouts[6]
 
-    # Colors
-    c_dark = RGBColor(15, 23, 42)        # Slate 950 #0F172A
-    c_card_dark = RGBColor(30, 41, 59)   # Slate 800 #1E293B
-    c_light_bg = RGBColor(248, 250, 252) # Slate 50 #F8FAFC
+    # Refined European Architectural Atelier Color Palette
+    c_obsidian = RGBColor(12, 16, 26)       # #0C101A (Deep Architectural Charcoal/Obsidian)
+    c_slate_dark = RGBColor(24, 30, 44)     # #181E2C (Card Dark)
+    c_light_bg = RGBColor(248, 249, 250)    # #F8F9FA (Warm Alabaster / Chalk)
     c_white = RGBColor(255, 255, 255)
-    c_blue = RGBColor(37, 99, 235)       # Blue 600 #2563EB
-    c_blue_light = RGBColor(239, 246, 255)
-    c_gray_text = RGBColor(100, 116, 139) # Slate 500
-    c_dark_text = RGBColor(15, 23, 42)
-    c_border = RGBColor(226, 232, 240)
-    c_emerald = RGBColor(5, 150, 105)
+    c_blueprint = RGBColor(30, 58, 138)     # #1E3A8A (Classic Architectural Blueprint Navy)
+    c_steel = RGBColor(37, 99, 235)         # #2563EB
+    c_titanium = RGBColor(180, 83, 9)       # #B45309 (Architectural Bronze / Ochre)
+    c_text_primary = RGBColor(15, 23, 42)   # #0F172A (Dense Charcoal)
+    c_text_secondary = RGBColor(71, 85, 105)# #475569 (Slate 600)
+    c_text_muted = RGBColor(148, 163, 184)  # #94A3B8 (Slate 400)
+    c_border = RGBColor(226, 232, 240)      # #E2E8F0 (Hairline Gray)
+    c_emerald = RGBColor(4, 120, 87)        # #047857 (Passivhaus Green)
 
     base_dir = "/Users/ankitkumar/.gemini/antigravity/scratch/bim-portfolio"
     
@@ -37,25 +39,25 @@ def create_presentation():
     img_p2 = os.path.join(base_dir, "public/assets/portfolio/2_Multi_Story_Residential_LOD300.jpg")
 
     def add_header(slide, title, category, sheet_code):
-        # Header text
+        # Header text box
         tb = slide.shapes.add_textbox(Inches(0.8), Inches(0.4), Inches(9.5), Inches(0.9))
         tf = tb.text_frame
         tf.word_wrap = True
         tf.margin_left = tf.margin_top = tf.margin_right = tf.margin_bottom = 0
         
         p0 = tf.paragraphs[0]
-        p0.text = f"THE RIBHUS BIM STUDIO  •  {category.upper()}  •  DWG NO: {sheet_code}"
-        p0.font.size = Pt(10)
+        p0.text = f"THE RIBHUS ARCHITECTURAL BIM ATELIER  •  {category.upper()}  •  DWG: {sheet_code}"
+        p0.font.size = Pt(9.5)
         p0.font.bold = True
-        p0.font.color.rgb = c_blue
-        p0.font.name = "Arial"
+        p0.font.color.rgb = c_blueprint
+        p0.font.name = "Helvetica Neue"
 
         p1 = tf.add_paragraph()
         p1.text = title
-        p1.font.size = Pt(22)
+        p1.font.size = Pt(21)
         p1.font.bold = True
-        p1.font.color.rgb = c_dark_text
-        p1.font.name = "Arial"
+        p1.font.color.rgb = c_text_primary
+        p1.font.name = "Helvetica Neue"
 
         # Right Studio Tag
         rtb = slide.shapes.add_textbox(Inches(10.2), Inches(0.4), Inches(2.3), Inches(0.7))
@@ -63,13 +65,13 @@ def create_presentation():
         rtf.word_wrap = True
         p_r = rtf.paragraphs[0]
         p_r.text = "theribhus.com\nRevit 2024 • LOD 300"
-        p_r.font.size = Pt(10)
-        p_r.font.name = "Arial"
-        p_r.font.color.rgb = c_gray_text
+        p_r.font.size = Pt(9.5)
+        p_r.font.name = "Helvetica Neue"
+        p_r.font.color.rgb = c_text_secondary
         p_r.alignment = PP_ALIGN.RIGHT
 
-        # Rule line
-        line = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0.8), Inches(1.35), Inches(11.733), Inches(0.02))
+        # Hairline rule
+        line = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0.8), Inches(1.35), Inches(11.733), Inches(0.015))
         line.fill.solid()
         line.fill.fore_color.rgb = c_border
         line.line.color.rgb = c_border
@@ -86,17 +88,17 @@ def create_presentation():
         p = tf.paragraphs[0]
         p.text = f"Modern House: A Study in Minimalism  |  Autodesk Revit BIM Model  |  Page {sheet_num:02d} of {total_sheets:02d}"
         p.font.size = Pt(9)
-        p.font.color.rgb = c_gray_text
-        p.font.name = "Arial"
+        p.font.color.rgb = c_text_secondary
+        p.font.name = "Helvetica Neue"
 
     # =========================================================================
-    # SLIDE 1: COVER SLIDE (DARK ELEGANT ARCHITECTURAL THEME)
+    # SLIDE 1: COVER SLIDE (OBSIDIAN ARCHITECTURAL ATELIER THEME)
     # =========================================================================
     s1 = prs.slides.add_slide(blank_layout)
     bg1 = s1.shapes.add_shape(MSO_SHAPE.RECTANGLE, 0, 0, Inches(13.333), Inches(7.5))
     bg1.fill.solid()
-    bg1.fill.fore_color.rgb = c_dark
-    bg1.line.color.rgb = c_dark
+    bg1.fill.fore_color.rgb = c_obsidian
+    bg1.line.color.rgb = c_obsidian
 
     # Left content box
     tb = s1.shapes.add_textbox(Inches(0.9), Inches(1.0), Inches(5.8), Inches(5.5))
@@ -105,25 +107,25 @@ def create_presentation():
 
     p = tf.paragraphs[0]
     p.text = "THE RIBHUS  •  theribhus.com"
-    p.font.size = Pt(11)
+    p.font.size = Pt(10.5)
     p.font.bold = True
-    p.font.color.rgb = c_blue
-    p.font.name = "Arial"
+    p.font.color.rgb = RGBColor(96, 165, 250)
+    p.font.name = "Helvetica Neue"
 
     p2 = tf.add_paragraph()
     p2.text = "Modern House:"
     p2.font.size = Pt(44)
     p2.font.bold = True
     p2.font.color.rgb = c_white
-    p2.font.name = "Arial"
-    p2.space_before = Pt(10)
+    p2.font.name = "Helvetica Neue"
+    p2.space_before = Pt(8)
 
     p3 = tf.add_paragraph()
     p3.text = "A Study in Minimalism | BIM Driven Design\nFull Project Documentation Set"
     p3.font.size = Pt(16)
     p3.font.bold = True
-    p3.font.color.rgb = RGBColor(148, 163, 184)
-    p3.font.name = "Arial"
+    p3.font.color.rgb = RGBColor(203, 213, 225)
+    p3.font.name = "Helvetica Neue"
     p3.space_before = Pt(6)
 
     p4 = tf.add_paragraph()
@@ -132,35 +134,35 @@ def create_presentation():
         "and CAD files into production-ready Autodesk Revit (.rvt) and ArchiCAD (.pln) "
         "models with watertight thermal envelopes for European architects and Energieberater."
     )
-    p4.font.size = Pt(11)
-    p4.font.color.rgb = RGBColor(203, 213, 225)
-    p4.font.name = "Arial"
-    p4.space_before = Pt(18)
+    p4.font.size = Pt(10.5)
+    p4.font.color.rgb = RGBColor(226, 232, 240)
+    p4.font.name = "Helvetica Neue"
+    p4.space_before = Pt(16)
 
     p5 = tf.add_paragraph()
     p5.text = (
         "• Authoring Platform: Autodesk Revit 2024 + OpenBIM IFC4\n"
         "• Specification Level: LOD 300 (Strictly No MEP Overhead)\n"
-        "• Compliance: DIN EN 12831, DIN 277, GEG 2024\n"
-        "• Turnaround: 24 – 48 Hours"
+        "• Standards: DIN EN 12831, DIN 277, GEG 2024\n"
+        "• Guaranteed Turnaround: 24 – 48 Hours"
     )
     p5.font.size = Pt(10)
     p5.font.color.rgb = RGBColor(148, 163, 184)
-    p5.font.name = "Arial"
+    p5.font.name = "Helvetica Neue"
     p5.space_before = Pt(16)
 
     # Right Image
     if os.path.exists(img_ortho):
-        s1.shapes.add_picture(img_ortho, Inches(7.0), Inches(1.0), width=Inches(5.5))
+        s1.shapes.add_picture(img_ortho, Inches(6.9), Inches(1.0), width=Inches(5.6))
 
     # Bottom Tagline
     tb_bot = s1.shapes.add_textbox(Inches(0.9), Inches(6.8), Inches(11.5), Inches(0.4))
     tf_bot = tb_bot.text_frame
     p_bot = tf_bot.paragraphs[0]
-    p_bot.text = "Confidential Portfolio Presentation  •  The Ribhus  •  info@theribhus.com  •  https://ankitk-glitch.github.io/3d-portfolio/"
+    p_bot.text = "Confidential Portfolio Presentation  •  The Ribhus  •  contact@theribhus.com  •  https://ankitk-glitch.github.io/3d-portfolio/"
     p_bot.font.size = Pt(9)
     p_bot.font.color.rgb = RGBColor(100, 116, 139)
-    p_bot.font.name = "Arial"
+    p_bot.font.name = "Helvetica Neue"
 
     # =========================================================================
     # SLIDE 2: PROJECT OVERVIEW & SPATIAL ZONING
@@ -181,10 +183,10 @@ def create_presentation():
 
     p = tf_l.paragraphs[0]
     p.text = "Modern Minimalist Residence: Space Planning & Architecture"
-    p.font.size = Pt(14)
+    p.font.size = Pt(13)
     p.font.bold = True
-    p.font.color.rgb = c_dark_text
-    p.font.name = "Arial"
+    p.font.color.rgb = c_text_primary
+    p.font.name = "Helvetica Neue"
 
     p_desc = tf_l.add_paragraph()
     p_desc.text = (
@@ -192,9 +194,9 @@ def create_presentation():
         "The project balances a fluid floor plan across private and social zones, "
         "integrating high-end functional amenities with distinct material selections."
     )
-    p_desc.font.size = Pt(11)
-    p_desc.font.color.rgb = c_gray_text
-    p_desc.space_before = Pt(8)
+    p_desc.font.size = Pt(10.5)
+    p_desc.font.color.rgb = c_text_secondary
+    p_desc.space_before = Pt(7)
 
     pillars = [
         ("Strategic Spatial Zoning", "Optimized floor plan separating 4 independent master bedrooms from a spacious, open-concept studio living area with double-height volume."),
@@ -202,25 +204,25 @@ def create_presentation():
         ("Landscape & Water Features", "Curated site design integrating lush greenery with an infinity swimming pool, sunken fire pit lounge, and decorative water features.")
     ]
 
-    for title, desc in pillars:
+    for p_title, p_body in pillars:
         pt = tf_l.add_paragraph()
-        pt.text = f"■  {title}"
-        pt.font.size = Pt(11)
+        pt.text = f"■  {p_title}"
+        pt.font.size = Pt(10.5)
         pt.font.bold = True
-        pt.font.color.rgb = c_blue
-        pt.space_before = Pt(12)
+        pt.font.color.rgb = c_blueprint
+        pt.space_before = Pt(11)
 
         pd = tf_l.add_paragraph()
-        pd.text = desc
-        pd.font.size = Pt(10)
-        pd.font.color.rgb = c_dark_text
+        pd.text = p_body
+        pd.font.size = Pt(9.5)
+        pd.font.color.rgb = c_text_primary
         pd.space_before = Pt(2)
 
     # Right Card: Quantities & Performance Data
     card_r = s2.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(7.9), Inches(1.6), Inches(4.6), Inches(5.1))
     card_r.fill.solid()
-    card_r.fill.fore_color.rgb = c_dark
-    card_r.line.color.rgb = c_dark
+    card_r.fill.fore_color.rgb = c_obsidian
+    card_r.line.color.rgb = c_obsidian
 
     tb_r = s2.shapes.add_textbox(Inches(8.2), Inches(1.9), Inches(4.0), Inches(4.5))
     tf_r = tb_r.text_frame
@@ -246,9 +248,9 @@ def create_presentation():
     for label, val in metrics:
         p_row = tf_r.add_paragraph()
         p_row.text = f"{label}:  {val}"
-        p_row.font.size = Pt(10)
+        p_row.font.size = Pt(9.5)
         p_row.font.color.rgb = RGBColor(226, 232, 240)
-        p_row.space_before = Pt(9)
+        p_row.space_before = Pt(8.5)
 
     # =========================================================================
     # SLIDE 3: BOARD 01 - ORTHOGRAPHIC 3D AXONOMETRIC VIEW
@@ -271,13 +273,13 @@ def create_presentation():
     tf_s3.word_wrap = True
     p = tf_s3.paragraphs[0]
     p.text = "Sheet Specification"
-    p.font.size = Pt(12)
+    p.font.size = Pt(11.5)
     p.font.bold = True
-    p.font.color.rgb = c_dark_text
+    p.font.color.rgb = c_text_primary
 
     items_s3 = [
-        ("Camera Type", "Orthographic Axonometric (30°/60°)"),
-        ("BIM Authoring", "Autodesk Revit 2024"),
+        ("View Type", "Orthographic Axonometric (30°/60°)"),
+        ("BIM Platform", "Autodesk Revit 2024"),
         ("Model LOD", "LOD 300 (Design Development)"),
         ("Site Hardscape", "Driveway, Pergola, Pool Deck"),
         ("Landscape Detail", "Intensive Sedum Green Roof"),
@@ -287,8 +289,8 @@ def create_presentation():
         p_it = tf_s3.add_paragraph()
         p_it.text = f"{lbl}:\n{v}"
         p_it.font.size = Pt(9)
-        p_it.font.color.rgb = c_gray_text
-        p_it.space_before = Pt(10)
+        p_it.font.color.rgb = c_text_secondary
+        p_it.space_before = Pt(9.5)
 
     # =========================================================================
     # SLIDE 4: BOARD 02 - GROUND FLOOR & SITE PLAN (1:100)
@@ -310,9 +312,9 @@ def create_presentation():
     tf_s4.word_wrap = True
     p = tf_s4.paragraphs[0]
     p.text = "Ground Floor Programming"
-    p.font.size = Pt(12)
+    p.font.size = Pt(11.5)
     p.font.bold = True
-    p.font.color.rgb = c_dark_text
+    p.font.color.rgb = c_text_primary
 
     items_s4 = [
         ("Gross Floor Area (BGF)", "185.2 m²"),
@@ -327,8 +329,8 @@ def create_presentation():
         p_it = tf_s4.add_paragraph()
         p_it.text = f"• {lbl}: {v}"
         p_it.font.size = Pt(9)
-        p_it.font.color.rgb = c_gray_text
-        p_it.space_before = Pt(8)
+        p_it.font.color.rgb = c_text_secondary
+        p_it.space_before = Pt(7.5)
 
     # =========================================================================
     # SLIDE 5: BOARD 03 - UPPER LEVEL & GREEN ROOF PLAN
@@ -350,9 +352,9 @@ def create_presentation():
     tf_s5.word_wrap = True
     p = tf_s5.paragraphs[0]
     p.text = "Upper Level Programming"
-    p.font.size = Pt(12)
+    p.font.size = Pt(11.5)
     p.font.bold = True
-    p.font.color.rgb = c_dark_text
+    p.font.color.rgb = c_text_primary
 
     items_s5 = [
         ("Gross Floor Area (BGF)", "157.3 m²"),
@@ -366,8 +368,8 @@ def create_presentation():
         p_it = tf_s5.add_paragraph()
         p_it.text = f"• {lbl}: {v}"
         p_it.font.size = Pt(9)
-        p_it.font.color.rgb = c_gray_text
-        p_it.space_before = Pt(8)
+        p_it.font.color.rgb = c_text_secondary
+        p_it.space_before = Pt(7.5)
 
     # =========================================================================
     # SLIDE 6: BOARD 04 & 05 - SECTIONS & ELEVATIONS
@@ -399,9 +401,9 @@ def create_presentation():
         "Facade: Anthracite Zinc Standing-Seam Cladding (RAL 7016) + Cedar Siding  |  "
         "Glazing: Triple Insulated Argon (Ug = 0.5 W/m²K, Uw = 0.78 W/m²K)"
     )
-    p.font.size = Pt(10)
+    p.font.size = Pt(9.5)
     p.font.bold = True
-    p.font.color.rgb = c_dark_text
+    p.font.color.rgb = c_text_primary
 
     # =========================================================================
     # SLIDE 7: BOARD 06 - 3D EXPLODED AXONOMETRIC (MODEL ASSEMBLY)
@@ -423,9 +425,9 @@ def create_presentation():
     tf_s7.word_wrap = True
     p = tf_s7.paragraphs[0]
     p.text = "4-Tier BIM Hierarchy"
-    p.font.size = Pt(12)
+    p.font.size = Pt(11.5)
     p.font.bold = True
-    p.font.color.rgb = c_dark_text
+    p.font.color.rgb = c_text_primary
 
     tiers = [
         ("Tier 4: Roof Deck", "Extensive green roof garden, sedum layer, drainage mat, parapet capping."),
@@ -436,15 +438,15 @@ def create_presentation():
     for t_name, t_desc in tiers:
         pt = tf_s7.add_paragraph()
         pt.text = f"▲  {t_name}"
-        pt.font.size = Pt(10)
+        pt.font.size = Pt(9.5)
         pt.font.bold = True
-        pt.font.color.rgb = c_blue
-        pt.space_before = Pt(8)
+        pt.font.color.rgb = c_blueprint
+        pt.space_before = Pt(7.5)
 
         pd = tf_s7.add_paragraph()
         pd.text = t_desc
-        pd.font.size = Pt(9)
-        pd.font.color.rgb = c_gray_text
+        pd.font.size = Pt(8.5)
+        pd.font.color.rgb = c_text_secondary
 
     # =========================================================================
     # SLIDE 8: BOARD 07 - BUILDING PHYSICS & DIN EN 12831 AUDIT
@@ -458,15 +460,15 @@ def create_presentation():
 
     card_s8 = s8.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(8.8), Inches(1.55), Inches(3.7), Inches(5.15))
     card_s8.fill.solid()
-    card_s8.fill.fore_color.rgb = c_dark
-    card_s8.line.color.rgb = c_dark
+    card_s8.fill.fore_color.rgb = c_obsidian
+    card_s8.line.color.rgb = c_obsidian
 
     tb_s8 = s8.shapes.add_textbox(Inches(9.0), Inches(1.75), Inches(3.3), Inches(4.7))
     tf_s8 = tb_s8.text_frame
     tf_s8.word_wrap = True
     p = tf_s8.paragraphs[0]
     p.text = "Thermal Envelope Metrics"
-    p.font.size = Pt(12)
+    p.font.size = Pt(11.5)
     p.font.bold = True
     p.font.color.rgb = c_white
 
@@ -484,7 +486,7 @@ def create_presentation():
         p_it.text = f"{lbl}:\n{v}"
         p_it.font.size = Pt(9)
         p_it.font.color.rgb = RGBColor(203, 213, 225)
-        p_it.space_before = Pt(7)
+        p_it.space_before = Pt(6.5)
 
     # =========================================================================
     # SLIDE 9: BOARD 08 - REVIT QUANTITIES TAKEOFF (QTO)
@@ -504,9 +506,9 @@ def create_presentation():
 
     p = tf_tab.paragraphs[0]
     p.text = "Automated Material Schedules (Massenermittlung)"
-    p.font.size = Pt(13)
+    p.font.size = Pt(12)
     p.font.bold = True
-    p.font.color.rgb = c_dark_text
+    p.font.color.rgb = c_text_primary
 
     schedules = [
         ("Concrete C30/37 Volume", "142.6 m³", "Foundation, RC columns & slabs"),
@@ -521,15 +523,15 @@ def create_presentation():
     for item, qty, note in schedules:
         pi = tf_tab.add_paragraph()
         pi.text = f"■ {item}:  {qty}"
-        pi.font.size = Pt(10)
+        pi.font.size = Pt(9.5)
         pi.font.bold = True
-        pi.font.color.rgb = c_blue
-        pi.space_before = Pt(7)
+        pi.font.color.rgb = c_blueprint
+        pi.space_before = Pt(6.5)
 
         pn = tf_tab.add_paragraph()
         pn.text = f"   Scope: {note}"
-        pn.font.size = Pt(9)
-        pn.font.color.rgb = c_gray_text
+        pn.font.size = Pt(8.5)
+        pn.font.color.rgb = c_text_secondary
 
     # =========================================================================
     # SLIDE 10: URBAN MULTI-STORY REFERENCE (BOARD 09)
@@ -551,9 +553,9 @@ def create_presentation():
     tf_s10.word_wrap = True
     p = tf_s10.paragraphs[0]
     p.text = "Multi-Family Residential Scope"
-    p.font.size = Pt(12)
+    p.font.size = Pt(11.5)
     p.font.bold = True
-    p.font.color.rgb = c_dark_text
+    p.font.color.rgb = c_text_primary
 
     multi_items = [
         ("Typology", "Urban Multi-Story Residential Building"),
@@ -569,8 +571,8 @@ def create_presentation():
         p_it = tf_s10.add_paragraph()
         p_it.text = f"• {lbl}: {v}"
         p_it.font.size = Pt(9)
-        p_it.font.color.rgb = c_gray_text
-        p_it.space_before = Pt(7)
+        p_it.font.color.rgb = c_text_secondary
+        p_it.space_before = Pt(6.5)
 
     # =========================================================================
     # SLIDE 11: PRICING & PRODUCTION PACKAGES
@@ -611,9 +613,9 @@ def create_presentation():
         card = s11.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left_pos[i], Inches(1.6), Inches(3.7), Inches(5.1))
         card.fill.solid()
         if is_pop:
-            card.fill.fore_color.rgb = c_dark
-            card.line.color.rgb = c_blue
-            card.line.width = Pt(2)
+            card.fill.fore_color.rgb = c_obsidian
+            card.line.color.rgb = c_blueprint
+            card.line.width = Pt(1.5)
         else:
             card.fill.fore_color.rgb = c_light_bg
             card.line.color.rgb = c_border
@@ -624,29 +626,29 @@ def create_presentation():
 
         p0 = tf.paragraphs[0]
         p0.text = p_title
-        p0.font.size = Pt(11)
+        p0.font.size = Pt(10.5)
         p0.font.bold = True
-        p0.font.color.rgb = c_white if is_pop else c_dark_text
+        p0.font.color.rgb = c_white if is_pop else c_text_primary
 
         p_pr = tf.add_paragraph()
         p_pr.text = p_price
-        p_pr.font.size = Pt(18)
+        p_pr.font.size = Pt(17)
         p_pr.font.bold = True
-        p_pr.font.color.rgb = c_blue if not is_pop else RGBColor(96, 165, 250)
+        p_pr.font.color.rgb = c_blueprint if not is_pop else RGBColor(96, 165, 250)
         p_pr.space_before = Pt(4)
 
         p_tm = tf.add_paragraph()
         p_tm.text = f"Turnaround: {p_time}"
-        p_tm.font.size = Pt(9)
-        p_tm.font.color.rgb = RGBColor(148, 163, 184) if is_pop else c_gray_text
+        p_tm.font.size = Pt(8.5)
+        p_tm.font.color.rgb = RGBColor(148, 163, 184) if is_pop else c_text_secondary
         p_tm.space_before = Pt(2)
 
         for f in feats:
             pf = tf.add_paragraph()
             pf.text = f"✓ {f}"
-            pf.font.size = Pt(9)
-            pf.font.color.rgb = RGBColor(226, 232, 240) if is_pop else c_dark_text
-            pf.space_before = Pt(6)
+            pf.font.size = Pt(8.5)
+            pf.font.color.rgb = RGBColor(226, 232, 240) if is_pop else c_text_primary
+            pf.space_before = Pt(5.5)
 
     # =========================================================================
     # SLIDE 12: STUDIO CONTACT & HOW TO ORDER
@@ -654,23 +656,23 @@ def create_presentation():
     s12 = prs.slides.add_slide(blank_layout)
     bg12 = s12.shapes.add_shape(MSO_SHAPE.RECTANGLE, 0, 0, Inches(13.333), Inches(7.5))
     bg12.fill.solid()
-    bg12.fill.fore_color.rgb = c_dark
-    bg12.line.color.rgb = c_dark
+    bg12.fill.fore_color.rgb = c_obsidian
+    bg12.line.color.rgb = c_obsidian
 
     tb_end = s12.shapes.add_textbox(Inches(1.5), Inches(1.5), Inches(10.333), Inches(4.5))
     tf_end = tb_end.text_frame
     tf_end.word_wrap = True
 
     p0 = tf_end.paragraphs[0]
-    p0.text = "THE RIBHUS  •  BIM ARCHITECTURAL POD"
-    p0.font.size = Pt(12)
+    p0.text = "THE RIBHUS  •  BIM ARCHITECTURAL ATELIER"
+    p0.font.size = Pt(11)
     p0.font.bold = True
-    p0.font.color.rgb = c_blue
-    p0.font.name = "Arial"
+    p0.font.color.rgb = RGBColor(96, 165, 250)
+    p0.font.name = "Helvetica Neue"
 
     p1 = tf_end.add_paragraph()
     p1.text = "Ready to convert your 2D plans into 3D BIM models?"
-    p1.font.size = Pt(28)
+    p1.font.size = Pt(26)
     p1.font.bold = True
     p1.font.color.rgb = c_white
     p1.space_before = Pt(10)
@@ -680,7 +682,7 @@ def create_presentation():
         "Send your scanned blueprints, PDF drawings, or DWG surveys. "
         "We deliver production-ready ArchiCAD (.pln) and Revit (.rvt) models in 24–48 hours."
     )
-    p2.font.size = Pt(13)
+    p2.font.size = Pt(12)
     p2.font.color.rgb = RGBColor(203, 213, 225)
     p2.space_before = Pt(12)
 
@@ -692,9 +694,9 @@ def create_presentation():
         "📍 Production Pods: Germany, Austria, Switzerland, European Union\n"
         "⚡ Deliverables: Autodesk Revit (.rvt), ArchiCAD (.pln), OpenBIM (.ifc), AutoCAD (.dwg)"
     )
-    p3.font.size = Pt(11)
+    p3.font.size = Pt(10.5)
     p3.font.color.rgb = RGBColor(148, 163, 184)
-    p3.space_before = Pt(20)
+    p3.space_before = Pt(18)
 
     out_file = os.path.join(base_dir, "public/Modern_House_BIM_Portfolio_The_Ribhus.pptx")
     prs.save(out_file)

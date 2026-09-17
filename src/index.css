@@ -3,25 +3,38 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
   body {
-    @apply bg-slate-50 text-slate-900 font-sans antialiased selection:bg-cyan-500 selection:text-white;
+    @apply bg-[#F9FAFB] text-[#0F172A] font-sans antialiased selection:bg-[#0F172A] selection:text-white;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-tight text-[#0A0F1D];
   }
 }
 
-/* Subtle Architectural Grid Pattern */
+/* Precision Architectural Grid Pattern */
 .bg-arch-grid {
-  background-size: 30px 30px;
+  background-size: 24px 24px;
   background-image: 
     linear-gradient(to right, rgba(15, 23, 42, 0.04) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
 }
 
 .bg-dot-pattern {
-  background-size: 20px 20px;
-  background-image: radial-gradient(circle, rgba(15, 23, 42, 0.08) 1px, transparent 1px);
+  background-size: 16px 16px;
+  background-image: radial-gradient(circle, rgba(15, 23, 42, 0.09) 1px, transparent 1px);
 }
 
-/* Print Styles for PDF Export */
+/* Clean Architectural Paper Border */
+.arch-border {
+  border: 1px solid #E2E8F0;
+}
+
+/* Print Styles for Clean A3/A4 Landscape PDF Export */
 @media print {
   body {
     background: white !important;
@@ -42,12 +55,12 @@
   }
 }
 
-/* Smooth Fade In */
+/* Subtle Entry Animation */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
+  from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 .animate-fadeIn {
-  animation: fadeIn 0.35s ease-out forwards;
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

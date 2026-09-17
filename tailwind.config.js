@@ -4,43 +4,47 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
-  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        bim: {
-          50: '#f0f7ff',
-          100: '#e0effe',
-          200: '#bae0fd',
-          300: '#7cc7fb',
-          400: '#38aaf6',
-          500: '#0e8de9',
-          600: '#026fc7',
-          700: '#0358a1',
-          800: '#074b84',
-          900: '#0b3f6f',
-          950: '#07284a',
+        studio: {
+          50: '#F8FAFC',
+          100: '#F1F5F9',
+          200: '#E2E8F0',
+          300: '#CBD5E1',
+          400: '#94A3B8',
+          500: '#64748B',
+          600: '#475569',
+          700: '#334155',
+          800: '#1E293B',
+          900: '#0F172A',
+          950: '#090D16',
         },
-        slate: {
-          850: '#151f33',
-          900: '#0f172a',
-          950: '#080d1a',
-        },
-        thermal: {
-          cold: '#3b82f6',
-          cool: '#06b6d4',
-          optimal: '#10b981',
-          warm: '#f59e0b',
-          hot: '#ef4444',
+        arch: {
+          primary: '#0B1528', // Rich architectural obsidian navy
+          blueprint: '#1E3A8A', // Classic blueprint blue
+          steel: '#2563EB',
+          cad: '#0284C7',
+          charcoal: '#181A1F',
+          graphite: '#272A30',
+          line: '#E5E7EB',
+          sand: '#FAF9F6',
+          bronze: '#B45309',
         }
       },
       fontFamily: {
-        mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
-        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        display: ['"Plus Jakarta Sans"', '"Space Grotesk"', 'Inter', 'sans-serif'],
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'SFMono-Regular', 'Menlo', 'monospace'],
       },
-      boxShadow: {
-        'glow-cyan': '0 0 25px -5px rgba(6, 182, 212, 0.3)',
-        'glow-blue': '0 0 25px -5px rgba(14, 141, 233, 0.35)',
+      letterSpacing: {
+        tightest: '-0.04em',
+        tighter: '-0.025em',
+        tight: '-0.015em',
+        normal: '0',
+        wide: '0.04em',
+        wider: '0.08em',
+        widest: '0.14em',
       }
     },
   },

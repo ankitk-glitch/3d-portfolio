@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Layers, Menu, X, ArrowUpRight, Clock, FileCheck, Sparkles } from 'lucide-react';
+import { Box, Layers, Menu, X, ArrowUpRight, Sparkles } from 'lucide-react';
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -25,55 +25,55 @@ export default function Navbar() {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? 'bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm py-3'
-          : 'bg-white/80 backdrop-blur-sm border-b border-slate-100 py-4'
+          ? 'bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-[0_1px_8px_rgba(0,0,0,0.04)] py-3'
+          : 'bg-[#FAFAFA]/90 backdrop-blur-sm border-b border-slate-200/50 py-4'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-        {/* Logo */}
-        <a href="#" className="flex items-center gap-3 group">
-          <div className="w-9 h-9 rounded-lg bg-slate-900 flex items-center justify-center text-white shadow-md group-hover:bg-blue-600 transition-colors">
-            <Box size={20} />
+        {/* Studio Logo & Identity */}
+        <a href="#" className="flex items-center gap-3.5 group">
+          <div className="w-9 h-9 rounded-xl bg-[#0F172A] flex items-center justify-center text-white shadow-sm group-hover:bg-[#1E3A8A] transition-colors">
+            <Box size={19} className="stroke-[2.2]" />
           </div>
           <div>
-            <div className="font-extrabold text-base tracking-tight text-slate-900 flex items-center gap-1.5">
+            <div className="font-display font-black text-sm sm:text-base tracking-tight text-[#0F172A] flex items-center gap-2">
               THE RIBHUS
-              <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-300">
-                BIM STUDIO
+              <span className="text-[9px] font-mono font-bold tracking-widest px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                BIM ATELIER
               </span>
             </div>
-            <div className="text-[10px] font-mono text-slate-500">
+            <div className="text-[10px] font-mono tracking-tight text-slate-500">
               theribhus.com &bull; European Architectural 3D Modeling
             </div>
           </div>
         </a>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-6 text-xs font-semibold text-slate-700">
+        <nav className="hidden md:flex items-center gap-7">
           {navLinks.map((link) => (
             <a
               key={link.label}
               href={link.href}
-              className={`transition-colors tracking-wide flex items-center gap-1 ${
+              className={`transition-all flex items-center gap-1.5 ${
                 link.featured
-                  ? 'px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 font-bold hover:bg-blue-100'
-                  : 'hover:text-blue-600'
+                  ? 'px-3 py-1.5 rounded-lg bg-[#0F172A] text-white font-mono text-[11px] font-bold tracking-wider uppercase shadow-sm hover:bg-[#1E3A8A]'
+                  : 'font-mono text-[11px] uppercase tracking-wider font-semibold text-slate-600 hover:text-[#0F172A]'
               }`}
             >
-              {link.featured && <Sparkles size={12} className="text-blue-600" />}
+              {link.featured && <Sparkles size={11} className="text-amber-300" />}
               <span>{link.label}</span>
             </a>
           ))}
         </nav>
 
-        {/* Action Button */}
+        {/* Action CTA */}
         <div className="hidden lg:flex items-center gap-4">
           <a
             href="#request-form"
-            className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-blue-600 text-white font-mono text-xs font-bold transition-colors shadow-sm flex items-center gap-2 cursor-pointer"
+            className="px-4 py-2 rounded-xl bg-white hover:bg-slate-50 text-[#0F172A] border border-slate-300 font-mono text-[11px] font-bold uppercase tracking-wider shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"
           >
             <span>Send 2D Plans</span>
-            <ArrowUpRight size={14} />
+            <ArrowUpRight size={13} />
           </a>
         </div>
 
@@ -81,7 +81,7 @@ export default function Navbar() {
         <div className="flex md:hidden">
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors"
+            className="p-2 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer"
           >
             {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
@@ -96,9 +96,9 @@ export default function Navbar() {
               key={link.label}
               href={link.href}
               onClick={() => setMobileMenuOpen(false)}
-              className={`block px-3 py-2 rounded-lg text-sm font-semibold ${
+              className={`block px-3 py-2 rounded-lg text-xs font-mono uppercase tracking-wider font-semibold ${
                 link.featured
-                  ? 'bg-blue-50 text-blue-700 font-bold'
+                  ? 'bg-[#0F172A] text-white font-bold'
                   : 'text-slate-700 hover:bg-slate-100'
               }`}
             >
@@ -109,7 +109,7 @@ export default function Navbar() {
             <a
               href="#request-form"
               onClick={() => setMobileMenuOpen(false)}
-              className="w-full py-2.5 rounded-xl bg-slate-900 text-white font-mono text-xs font-bold flex items-center justify-center gap-2"
+              className="w-full py-2.5 rounded-xl bg-[#0F172A] text-white font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2"
             >
               <span>Send 2D Plans &bull; 24h Turnaround</span>
               <ArrowUpRight size={14} />
