@@ -1,711 +1,1034 @@
 import os
 from pptx import Presentation
-from pptx.util import Inches, Pt
+from pptx.util import Inches, Pt, Emu
 from pptx.dml.color import RGBColor
 from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
 from pptx.enum.shapes import MSO_SHAPE
 
+# ─── Color Palette (Blueprint Dark) ─────────────────────────────────────────
+OBSIDIAN    = RGBColor(6, 8, 15)         # #06080F
+DARK_CARD   = RGBColor(12, 16, 26)       # #0C101A
+MID_CARD    = RGBColor(16, 22, 38)       # #101626
+BLUE_400    = RGBColor(96, 165, 250)     # #60A5FA
+BLUE_500    = RGBColor(59, 130, 246)     # #3B82F6
+BLUE_800    = RGBColor(30, 58, 138)      # #1E3A8A
+WHITE       = RGBColor(255, 255, 255)
+OFF_WHITE   = RGBColor(226, 232, 240)    # #E2E8F0
+SLATE_400   = RGBColor(148, 163, 184)    # #94A3B8
+SLATE_500   = RGBColor(100, 116, 139)    # #64748B
+EMERALD     = RGBColor(52, 211, 153)     # #34D399
+AMBER       = RGBColor(251, 191, 36)     # #FBBF24
+
+BASE = "/Users/ankitkumar/.gemini/antigravity/scratch/bim-portfolio"
+
+IMGS = {
+    "ortho":     f"{BASE}/public/assets/portfolio/modern_house_orthographic_3d.png",
+    "floor":     f"{BASE}/public/assets/drawings/floor_plan.jpg",
+    "upper":     f"{BASE}/public/assets/portfolio/3_Architectural_Floorplan_3D.jpg",
+    "section":   f"{BASE}/public/assets/drawings/section_drawing.jpg",
+    "elevation": f"{BASE}/public/assets/drawings/elevation_drawing.jpg",
+    "axon":      f"{BASE}/public/assets/drawings/axonometric_exploded.jpg",
+    "physics":   f"{BASE}/public/assets/drawings/energy_audit_comparison.jpg",
+    "p1":        f"{BASE}/public/assets/portfolio/1_Single_Family_Home_LOD200.jpg",
+    "p2":        f"{BASE}/public/assets/portfolio/2_Multi_Story_Residential_LOD300.jpg",
+}
+
+W = Inches(13.333)
+H = Inches(7.5)
+
+def rgb(r, g, b): return RGBColor(r, g, b)
+
+def solid_bg(slide, color=OBSIDIAN):
+    bg = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, 0, 0, W, H)
+    bg.fill.solid()
+    bg.fill.fore_color.rgb = color
+    bg.line.fill.background()
+    return bg
+
+def add_rect(slide, x, y, w, h, fill, alpha=None, no_line=True):
+    s = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(x), Inches(y), Inches(w), Inches(h))
+    s.fill.solid()
+    s.fill.fore_color.rgb = fill
+    if no_line:
+        s.line.fill.background()
+    else:
+        s.line.color.rgb = fill
+    return s
+
+def tb(slide, x, y, w, h):
+    return slide.shapes.add_textbox(Inches(x), Inches(y), Inches(w), Inches(h))
+
+def add_para(tf, text, size, bold=False, color=OFF_WHITE, space_before=0, align=PP_ALIGN.LEFT, name="Helvetica Neue"):
+    p = tf.add_paragraph()
+    p.text = text
+    p.font.size = Pt(size)
+    p.font.bold = bold
+    p.font.color.rgb = color
+    p.font.name = name
+    if space_before:
+        p.space_before = Pt(space_before)
+    p.alignment = align
+    return p
+
+def add_label_pill(slide, x, y, text):
+    """Blueprint blue micro-label pill"""
+    bg = add_rect(slide, x, y, len(text)*0.068 + 0.3, 0.28, BLUE_800)
+    t = tb(slide, x + 0.08, y + 0.03, len(text)*0.068 + 0.1, 0.22)
+    tf = t.text_frame
+    p = tf.paragraphs[0]
+    p.text = text
+    p.font.size = Pt(8)
+    p.font.bold = True
+    p.font.color.rgb = BLUE_400
+    p.font.name = "Helvetica Neue"
+    return bg
+
+def add_corner_mark(slide, text="THE RIBHUS · theribhus.com"):
+    t = tb(slide, 0.35, 7.05, 4.5, 0.3)
+    tf = t.text_frame
+    p = tf.paragraphs[0]
+    p.text = text
+    p.font.size = Pt(7.5)
+    p.font.color.rgb = SLATE_500
+    p.font.name = "Helvetica Neue"
+
+    t2 = tb(slide, 8.8, 7.05, 4.2, 0.3)
+    tf2 = t2.text_frame
+    p2 = tf2.paragraphs[0]
+    p2.text = "Revit 2024  ·  ArchiCAD  ·  IFC4  ·  LOD 300"
+    p2.font.size = Pt(7.5)
+    p2.font.color.rgb = SLATE_500
+    p2.font.name = "Helvetica Neue"
+    p2.alignment = PP_ALIGN.RIGHT
+
+def blueprint_accent_line(slide, y=1.28):
+    """Thin blue glowing divider"""
+    line = add_rect(slide, 0.35, y, 12.633, 0.016, BLUE_500)
+    return line
+
+def section_tag(slide, x, y, label):
+    """Uppercase monospace category label"""
+    t = tb(slide, x, y, 4.0, 0.25)
+    tf = t.text_frame
+    p = tf.paragraphs[0]
+    p.text = label
+    p.font.size = Pt(8)
+    p.font.bold = True
+    p.font.color.rgb = BLUE_400
+    p.font.name = "Helvetica Neue"
+    return t
+
+def picture_if_exists(slide, key, x, y, width=None, height=None):
+    path = IMGS.get(key)
+    if path and os.path.exists(path):
+        kw = {}
+        if width:  kw["width"]  = Inches(width)
+        if height: kw["height"] = Inches(height)
+        pic = slide.shapes.add_picture(path, Inches(x), Inches(y), **kw)
+        return pic
+    return None
+
+# ─────────────────────────────────────────────────────────────────────────────
 def create_presentation():
     prs = Presentation()
-    # 16:9 widescreen format
-    prs.slide_width = Inches(13.333)
-    prs.slide_height = Inches(7.5)
-    blank_layout = prs.slide_layouts[6]
+    prs.slide_width  = W
+    prs.slide_height = H
+    blank = prs.slide_layouts[6]
 
-    # Refined European Architectural Atelier Color Palette
-    c_obsidian = RGBColor(12, 16, 26)       # #0C101A (Deep Architectural Charcoal/Obsidian)
-    c_slate_dark = RGBColor(24, 30, 44)     # #181E2C (Card Dark)
-    c_light_bg = RGBColor(248, 249, 250)    # #F8F9FA (Warm Alabaster / Chalk)
-    c_white = RGBColor(255, 255, 255)
-    c_blueprint = RGBColor(30, 58, 138)     # #1E3A8A (Classic Architectural Blueprint Navy)
-    c_steel = RGBColor(37, 99, 235)         # #2563EB
-    c_titanium = RGBColor(180, 83, 9)       # #B45309 (Architectural Bronze / Ochre)
-    c_text_primary = RGBColor(15, 23, 42)   # #0F172A (Dense Charcoal)
-    c_text_secondary = RGBColor(71, 85, 105)# #475569 (Slate 600)
-    c_text_muted = RGBColor(148, 163, 184)  # #94A3B8 (Slate 400)
-    c_border = RGBColor(226, 232, 240)      # #E2E8F0 (Hairline Gray)
-    c_emerald = RGBColor(4, 120, 87)        # #047857 (Passivhaus Green)
+    # =========================================================================
+    # SLIDE 01: CINEMATIC COVER  (full-bleed image + diagonal overlay)
+    # =========================================================================
+    s = prs.slides.add_slide(blank)
+    solid_bg(s, OBSIDIAN)
 
-    base_dir = "/Users/ankitkumar/.gemini/antigravity/scratch/bim-portfolio"
-    
-    img_ortho = os.path.join(base_dir, "public/assets/portfolio/modern_house_orthographic_3d.png")
-    img_floor = os.path.join(base_dir, "public/assets/drawings/floor_plan.jpg")
-    img_upper = os.path.join(base_dir, "public/assets/portfolio/3_Architectural_Floorplan_3D.jpg")
-    img_section = os.path.join(base_dir, "public/assets/drawings/section_drawing.jpg")
-    img_elevation = os.path.join(base_dir, "public/assets/drawings/elevation_drawing.jpg")
-    img_axon = os.path.join(base_dir, "public/assets/drawings/axonometric_exploded.jpg")
-    img_physics = os.path.join(base_dir, "public/assets/drawings/energy_audit_comparison.jpg")
-    img_p1 = os.path.join(base_dir, "public/assets/portfolio/1_Single_Family_Home_LOD200.jpg")
-    img_p2 = os.path.join(base_dir, "public/assets/portfolio/2_Multi_Story_Residential_LOD300.jpg")
+    # Full-bleed orthographic image (right 60%)
+    picture_if_exists(s, "ortho", 4.8, 0.0, width=8.533)
 
-    def add_header(slide, title, category, sheet_code):
-        # Header text box
-        tb = slide.shapes.add_textbox(Inches(0.8), Inches(0.4), Inches(9.5), Inches(0.9))
-        tf = tb.text_frame
+    # Diagonal dark overlay on left  (simulated with a wide left rect)
+    ov = add_rect(s, 0, 0, 7.2, 7.5, OBSIDIAN)
+
+    # Blue vertical accent stripe
+    add_rect(s, 0.35, 0, 0.05, 7.5, BLUE_500)
+
+    # Blueprint grid lines (horizontal stripes)
+    for i in range(8):
+        add_rect(s, 0.4, i * 0.93, 6.5, 0.01, rgb(59, 130, 246))
+
+    # Studio label
+    section_tag(s, 0.55, 0.45, "THE RIBHUS  ·  BIM ARCHITECTURAL ATELIER  ·  theribhus.com")
+
+    blueprint_accent_line(s, y=0.78)
+
+    # Giant headline
+    t1 = tb(s, 0.45, 1.0, 6.5, 2.8)
+    tf1 = t1.text_frame
+    tf1.word_wrap = True
+    p = tf1.paragraphs[0]
+    p.text = "Modern House:"
+    p.font.size = Pt(54)
+    p.font.bold = True
+    p.font.color.rgb = WHITE
+    p.font.name = "Helvetica Neue"
+
+    add_para(tf1, "A Study in Minimalism", 28, bold=True, color=BLUE_400, space_before=2)
+    add_para(tf1, "BIM-Driven Design  ·  Full Project", 15, color=OFF_WHITE, space_before=6)
+
+    blueprint_accent_line(s, y=4.15)
+
+    # 3 spec pills
+    specs = [
+        ("Platform", "Autodesk Revit 2024"),
+        ("Standard", "LOD 300 · DIN EN 12831"),
+        ("Delivery", "24 – 48 h · No MEP"),
+    ]
+    for i, (k, v) in enumerate(specs):
+        x = 0.45 + i * 2.1
+        t = tb(s, x, 4.28, 2.0, 0.65)
+        tf = t.text_frame
         tf.word_wrap = True
-        tf.margin_left = tf.margin_top = tf.margin_right = tf.margin_bottom = 0
-        
         p0 = tf.paragraphs[0]
-        p0.text = f"THE RIBHUS ARCHITECTURAL BIM ATELIER  •  {category.upper()}  •  DWG: {sheet_code}"
-        p0.font.size = Pt(9.5)
+        p0.text = k.upper()
+        p0.font.size = Pt(7.5)
         p0.font.bold = True
-        p0.font.color.rgb = c_blueprint
+        p0.font.color.rgb = BLUE_400
         p0.font.name = "Helvetica Neue"
+        add_para(tf, v, 9.5, bold=True, color=WHITE)
 
-        p1 = tf.add_paragraph()
-        p1.text = title
-        p1.font.size = Pt(21)
-        p1.font.bold = True
-        p1.font.color.rgb = c_text_primary
-        p1.font.name = "Helvetica Neue"
-
-        # Right Studio Tag
-        rtb = slide.shapes.add_textbox(Inches(10.2), Inches(0.4), Inches(2.3), Inches(0.7))
-        rtf = rtb.text_frame
-        rtf.word_wrap = True
-        p_r = rtf.paragraphs[0]
-        p_r.text = "theribhus.com\nRevit 2024 • LOD 300"
-        p_r.font.size = Pt(9.5)
-        p_r.font.name = "Helvetica Neue"
-        p_r.font.color.rgb = c_text_secondary
-        p_r.alignment = PP_ALIGN.RIGHT
-
-        # Hairline rule
-        line = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0.8), Inches(1.35), Inches(11.733), Inches(0.015))
-        line.fill.solid()
-        line.fill.fore_color.rgb = c_border
-        line.line.color.rgb = c_border
-
-    def add_footer(slide, sheet_num, total_sheets=12):
-        line = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0.8), Inches(6.9), Inches(11.733), Inches(0.01))
-        line.fill.solid()
-        line.fill.fore_color.rgb = c_border
-        line.line.color.rgb = c_border
-
-        tb = slide.shapes.add_textbox(Inches(0.8), Inches(6.95), Inches(11.733), Inches(0.4))
-        tf = tb.text_frame
-        tf.margin_left = tf.margin_top = tf.margin_right = tf.margin_bottom = 0
-        p = tf.paragraphs[0]
-        p.text = f"Modern House: A Study in Minimalism  |  Autodesk Revit BIM Model  |  Page {sheet_num:02d} of {total_sheets:02d}"
-        p.font.size = Pt(9)
-        p.font.color.rgb = c_text_secondary
-        p.font.name = "Helvetica Neue"
-
-    # =========================================================================
-    # SLIDE 1: COVER SLIDE (OBSIDIAN ARCHITECTURAL ATELIER THEME)
-    # =========================================================================
-    s1 = prs.slides.add_slide(blank_layout)
-    bg1 = s1.shapes.add_shape(MSO_SHAPE.RECTANGLE, 0, 0, Inches(13.333), Inches(7.5))
-    bg1.fill.solid()
-    bg1.fill.fore_color.rgb = c_obsidian
-    bg1.line.color.rgb = c_obsidian
-
-    # Left content box
-    tb = s1.shapes.add_textbox(Inches(0.9), Inches(1.0), Inches(5.8), Inches(5.5))
-    tf = tb.text_frame
-    tf.word_wrap = True
-
-    p = tf.paragraphs[0]
-    p.text = "THE RIBHUS  •  theribhus.com"
-    p.font.size = Pt(10.5)
-    p.font.bold = True
-    p.font.color.rgb = RGBColor(96, 165, 250)
-    p.font.name = "Helvetica Neue"
-
-    p2 = tf.add_paragraph()
-    p2.text = "Modern House:"
-    p2.font.size = Pt(44)
-    p2.font.bold = True
-    p2.font.color.rgb = c_white
-    p2.font.name = "Helvetica Neue"
-    p2.space_before = Pt(8)
-
-    p3 = tf.add_paragraph()
-    p3.text = "A Study in Minimalism | BIM Driven Design\nFull Project Documentation Set"
-    p3.font.size = Pt(16)
-    p3.font.bold = True
-    p3.font.color.rgb = RGBColor(203, 213, 225)
-    p3.font.name = "Helvetica Neue"
-    p3.space_before = Pt(6)
-
-    p4 = tf.add_paragraph()
-    p4.text = (
-        "Complete architectural BIM modeling portfolio. Converts 2D scans, sketches, "
-        "and CAD files into production-ready Autodesk Revit (.rvt) and ArchiCAD (.pln) "
-        "models with watertight thermal envelopes for European architects and Energieberater."
-    )
-    p4.font.size = Pt(10.5)
-    p4.font.color.rgb = RGBColor(226, 232, 240)
-    p4.font.name = "Helvetica Neue"
-    p4.space_before = Pt(16)
-
-    p5 = tf.add_paragraph()
-    p5.text = (
-        "• Authoring Platform: Autodesk Revit 2024 + OpenBIM IFC4\n"
-        "• Specification Level: LOD 300 (Strictly No MEP Overhead)\n"
-        "• Standards: DIN EN 12831, DIN 277, GEG 2024\n"
-        "• Guaranteed Turnaround: 24 – 48 Hours"
-    )
-    p5.font.size = Pt(10)
-    p5.font.color.rgb = RGBColor(148, 163, 184)
-    p5.font.name = "Helvetica Neue"
-    p5.space_before = Pt(16)
-
-    # Right Image
-    if os.path.exists(img_ortho):
-        s1.shapes.add_picture(img_ortho, Inches(6.9), Inches(1.0), width=Inches(5.6))
-
-    # Bottom Tagline
-    tb_bot = s1.shapes.add_textbox(Inches(0.9), Inches(6.8), Inches(11.5), Inches(0.4))
-    tf_bot = tb_bot.text_frame
-    p_bot = tf_bot.paragraphs[0]
-    p_bot.text = "Confidential Portfolio Presentation  •  The Ribhus  •  contact@theribhus.com  •  https://ankitk-glitch.github.io/3d-portfolio/"
-    p_bot.font.size = Pt(9)
-    p_bot.font.color.rgb = RGBColor(100, 116, 139)
-    p_bot.font.name = "Helvetica Neue"
-
-    # =========================================================================
-    # SLIDE 2: PROJECT OVERVIEW & SPATIAL ZONING
-    # =========================================================================
-    s2 = prs.slides.add_slide(blank_layout)
-    add_header(s2, "Executive Brief & Spatial Zoning Strategy", "Project Brief", "A-000")
-    add_footer(s2, 2)
-
-    # Narrative Card (Left)
-    card_l = s2.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(1.6), Inches(6.8), Inches(5.1))
-    card_l.fill.solid()
-    card_l.fill.fore_color.rgb = c_light_bg
-    card_l.line.color.rgb = c_border
-
-    tb_l = s2.shapes.add_textbox(Inches(1.1), Inches(1.8), Inches(6.2), Inches(4.7))
-    tf_l = tb_l.text_frame
-    tf_l.word_wrap = True
-
-    p = tf_l.paragraphs[0]
-    p.text = "Modern Minimalist Residence: Space Planning & Architecture"
-    p.font.size = Pt(13)
-    p.font.bold = True
-    p.font.color.rgb = c_text_primary
-    p.font.name = "Helvetica Neue"
-
-    p_desc = tf_l.add_paragraph()
-    p_desc.text = (
-        "Development of an efficient spatial layout and refined exterior character. "
-        "The project balances a fluid floor plan across private and social zones, "
-        "integrating high-end functional amenities with distinct material selections."
-    )
-    p_desc.font.size = Pt(10.5)
-    p_desc.font.color.rgb = c_text_secondary
-    p_desc.space_before = Pt(7)
-
-    pillars = [
-        ("Strategic Spatial Zoning", "Optimized floor plan separating 4 independent master bedrooms from a spacious, open-concept studio living area with double-height volume."),
-        ("Material & Facade Detail", "Sharp architectural geometries wrapped in premium charcoal metal cladding, natural cedar timber battens, and triple-pane structural curtain walls."),
-        ("Landscape & Water Features", "Curated site design integrating lush greenery with an infinity swimming pool, sunken fire pit lounge, and decorative water features.")
-    ]
-
-    for p_title, p_body in pillars:
-        pt = tf_l.add_paragraph()
-        pt.text = f"■  {p_title}"
-        pt.font.size = Pt(10.5)
-        pt.font.bold = True
-        pt.font.color.rgb = c_blueprint
-        pt.space_before = Pt(11)
-
-        pd = tf_l.add_paragraph()
-        pd.text = p_body
-        pd.font.size = Pt(9.5)
-        pd.font.color.rgb = c_text_primary
-        pd.space_before = Pt(2)
-
-    # Right Card: Quantities & Performance Data
-    card_r = s2.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(7.9), Inches(1.6), Inches(4.6), Inches(5.1))
-    card_r.fill.solid()
-    card_r.fill.fore_color.rgb = c_obsidian
-    card_r.line.color.rgb = c_obsidian
-
-    tb_r = s2.shapes.add_textbox(Inches(8.2), Inches(1.9), Inches(4.0), Inches(4.5))
-    tf_r = tb_r.text_frame
-    tf_r.word_wrap = True
-
-    pr_title = tf_r.paragraphs[0]
-    pr_title.text = "Key Project Quantities (BIM Takeoff)"
-    pr_title.font.size = Pt(13)
-    pr_title.font.bold = True
-    pr_title.font.color.rgb = c_white
-
-    metrics = [
-        ("Plot / Site Area", "840.0 m²"),
-        ("Gross Floor Area (BGF)", "342.5 m²"),
-        ("Net Usable Area (NRF)", "278.4 m²"),
-        ("Heated Gross Volume (Ve)", "965.0 m³"),
-        ("Envelope Surface Area (A)", "612.0 m²"),
-        ("Compactness Ratio (A/Ve)", "0.63 m⁻¹"),
-        ("Exterior Glazing Area", "118.4 m² (WWR: 32%)"),
-        ("Energy Standard", "Passivhaus / KfW 40")
-    ]
-
-    for label, val in metrics:
-        p_row = tf_r.add_paragraph()
-        p_row.text = f"{label}:  {val}"
-        p_row.font.size = Pt(9.5)
-        p_row.font.color.rgb = RGBColor(226, 232, 240)
-        p_row.space_before = Pt(8.5)
-
-    # =========================================================================
-    # SLIDE 3: BOARD 01 - ORTHOGRAPHIC 3D AXONOMETRIC VIEW
-    # =========================================================================
-    s3 = prs.slides.add_slide(blank_layout)
-    add_header(s3, "Orthographic 3D Axonometric Model View", "Architectural 3D", "A-001")
-    add_footer(s3, 3)
-
-    if os.path.exists(img_ortho):
-        s3.shapes.add_picture(img_ortho, Inches(0.8), Inches(1.55), width=Inches(8.5))
-
-    # Right info panel
-    card_s3 = s3.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(9.5), Inches(1.55), Inches(3.0), Inches(5.15))
-    card_s3.fill.solid()
-    card_s3.fill.fore_color.rgb = c_light_bg
-    card_s3.line.color.rgb = c_border
-
-    tb_s3 = s3.shapes.add_textbox(Inches(9.7), Inches(1.75), Inches(2.6), Inches(4.7))
-    tf_s3 = tb_s3.text_frame
-    tf_s3.word_wrap = True
-    p = tf_s3.paragraphs[0]
-    p.text = "Sheet Specification"
-    p.font.size = Pt(11.5)
-    p.font.bold = True
-    p.font.color.rgb = c_text_primary
-
-    items_s3 = [
-        ("View Type", "Orthographic Axonometric (30°/60°)"),
-        ("BIM Platform", "Autodesk Revit 2024"),
-        ("Model LOD", "LOD 300 (Design Development)"),
-        ("Site Hardscape", "Driveway, Pergola, Pool Deck"),
-        ("Landscape Detail", "Intensive Sedum Green Roof"),
-        ("Thermal Perimeter", "Watertight Envelope Shell")
-    ]
-    for lbl, v in items_s3:
-        p_it = tf_s3.add_paragraph()
-        p_it.text = f"{lbl}:\n{v}"
-        p_it.font.size = Pt(9)
-        p_it.font.color.rgb = c_text_secondary
-        p_it.space_before = Pt(9.5)
-
-    # =========================================================================
-    # SLIDE 4: BOARD 02 - GROUND FLOOR & SITE PLAN (1:100)
-    # =========================================================================
-    s4 = prs.slides.add_slide(blank_layout)
-    add_header(s4, "Ground Floor & Master Site Plan (Scale 1:100)", "Floor Plans", "A-101")
-    add_footer(s4, 4)
-
-    if os.path.exists(img_floor):
-        s4.shapes.add_picture(img_floor, Inches(0.8), Inches(1.55), width=Inches(8.0))
-
-    card_s4 = s4.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(9.0), Inches(1.55), Inches(3.5), Inches(5.15))
-    card_s4.fill.solid()
-    card_s4.fill.fore_color.rgb = c_light_bg
-    card_s4.line.color.rgb = c_border
-
-    tb_s4 = s4.shapes.add_textbox(Inches(9.2), Inches(1.75), Inches(3.1), Inches(4.7))
-    tf_s4 = tb_s4.text_frame
-    tf_s4.word_wrap = True
-    p = tf_s4.paragraphs[0]
-    p.text = "Ground Floor Programming"
-    p.font.size = Pt(11.5)
-    p.font.bold = True
-    p.font.color.rgb = c_text_primary
-
-    items_s4 = [
-        ("Gross Floor Area (BGF)", "185.2 m²"),
-        ("Double-Height Living", "64.8 m² (5.8m ceiling)"),
-        ("Dining & Kitchen Island", "38.2 m²"),
-        ("Guest Bedroom Suite", "22.4 m² (with ensuite)"),
-        ("Double Garage", "38.0 m²"),
-        ("Terrace & Pool Deck", "92.5 m²"),
-        ("DIN Compliance", "DIN 1356 & DIN 277")
-    ]
-    for lbl, v in items_s4:
-        p_it = tf_s4.add_paragraph()
-        p_it.text = f"• {lbl}: {v}"
-        p_it.font.size = Pt(9)
-        p_it.font.color.rgb = c_text_secondary
-        p_it.space_before = Pt(7.5)
-
-    # =========================================================================
-    # SLIDE 5: BOARD 03 - UPPER LEVEL & GREEN ROOF PLAN
-    # =========================================================================
-    s5 = prs.slides.add_slide(blank_layout)
-    add_header(s5, "Upper Floor & Intensive Green Roof Terrace (Scale 1:100)", "Floor Plans", "A-102")
-    add_footer(s5, 5)
-
-    if os.path.exists(img_upper):
-        s5.shapes.add_picture(img_upper, Inches(0.8), Inches(1.55), width=Inches(8.0))
-
-    card_s5 = s5.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(9.0), Inches(1.55), Inches(3.5), Inches(5.15))
-    card_s5.fill.solid()
-    card_s5.fill.fore_color.rgb = c_light_bg
-    card_s5.line.color.rgb = c_border
-
-    tb_s5 = s5.shapes.add_textbox(Inches(9.2), Inches(1.75), Inches(3.1), Inches(4.7))
-    tf_s5 = tb_s5.text_frame
-    tf_s5.word_wrap = True
-    p = tf_s5.paragraphs[0]
-    p.text = "Upper Level Programming"
-    p.font.size = Pt(11.5)
-    p.font.bold = True
-    p.font.color.rgb = c_text_primary
-
-    items_s5 = [
-        ("Gross Floor Area (BGF)", "157.3 m²"),
-        ("Master Bedroom 01", "28.5 m² (Ensuite + Walk-in)"),
-        ("Bedroom Suites 02, 03, 04", "18.2 m² each (Independent)"),
-        ("Central Gallery Lounge", "24.0 m² overlooking foyer"),
-        ("Green Roof Terrace", "88.0 m² (Sedum roof)"),
-        ("Clear Ceiling Height", "2.70 m finished")
-    ]
-    for lbl, v in items_s5:
-        p_it = tf_s5.add_paragraph()
-        p_it.text = f"• {lbl}: {v}"
-        p_it.font.size = Pt(9)
-        p_it.font.color.rgb = c_text_secondary
-        p_it.space_before = Pt(7.5)
-
-    # =========================================================================
-    # SLIDE 6: BOARD 04 & 05 - SECTIONS & ELEVATIONS
-    # =========================================================================
-    s6 = prs.slides.add_slide(blank_layout)
-    add_header(s6, "Architectural Building Sections & Exterior Facade Elevations", "Sections & Elevations", "A-201 / A-301")
-    add_footer(s6, 6)
-
-    # Left: Section
-    if os.path.exists(img_section):
-        s6.shapes.add_picture(img_section, Inches(0.8), Inches(1.55), width=Inches(5.7))
-
-    # Right: Elevation
-    if os.path.exists(img_elevation):
-        s6.shapes.add_picture(img_elevation, Inches(6.8), Inches(1.55), width=Inches(5.7))
-
-    # Bottom Callout Bar
-    bar_s6 = s6.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0.8), Inches(5.85), Inches(11.733), Inches(0.85))
-    bar_s6.fill.solid()
-    bar_s6.fill.fore_color.rgb = c_light_bg
-    bar_s6.line.color.rgb = c_border
-
-    tb_bar = s6.shapes.add_textbox(Inches(1.0), Inches(5.95), Inches(11.3), Inches(0.65))
-    tf_bar = tb_bar.text_frame
-    tf_bar.word_wrap = True
-    p = tf_bar.paragraphs[0]
+    # Description
+    t3 = tb(s, 0.45, 5.1, 6.4, 1.5)
+    tf3 = t3.text_frame
+    tf3.word_wrap = True
+    p = tf3.paragraphs[0]
     p.text = (
-        "Technical Datum: Floor-to-Floor 3.30m  |  Clear Heights: 2.85m Ground, 2.70m Level 1  |  "
-        "Facade: Anthracite Zinc Standing-Seam Cladding (RAL 7016) + Cedar Siding  |  "
-        "Glazing: Triple Insulated Argon (Ug = 0.5 W/m²K, Uw = 0.78 W/m²K)"
+        "European BIM production studio converting scanned paper drawings, "
+        "PDF blueprints & 2D CAD surveys into production-ready Revit (.rvt) "
+        "and ArchiCAD (.pln) architectural models for architects, real-estate "
+        "planners, and Energieberater across the EU."
     )
     p.font.size = Pt(9.5)
-    p.font.bold = True
-    p.font.color.rgb = c_text_primary
+    p.font.color.rgb = SLATE_400
+    p.font.name = "Helvetica Neue"
+
+    add_corner_mark(s)
 
     # =========================================================================
-    # SLIDE 7: BOARD 06 - 3D EXPLODED AXONOMETRIC (MODEL ASSEMBLY)
+    # SLIDE 02: SPATIAL BRIEF — split dark/light
     # =========================================================================
-    s7 = prs.slides.add_slide(blank_layout)
-    add_header(s7, "3D Exploded Axonometric & Model Assembly Hierarchy", "BIM Hierarchy", "A-401")
-    add_footer(s7, 7)
+    s = prs.slides.add_slide(blank)
+    solid_bg(s, OBSIDIAN)
 
-    if os.path.exists(img_axon):
-        s7.shapes.add_picture(img_axon, Inches(0.8), Inches(1.55), width=Inches(7.8))
+    # Right panel (light)
+    add_rect(s, 6.5, 0, 6.833, 7.5, rgb(248, 250, 255))
 
-    card_s7 = s7.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(8.8), Inches(1.55), Inches(3.7), Inches(5.15))
-    card_s7.fill.solid()
-    card_s7.fill.fore_color.rgb = c_light_bg
-    card_s7.line.color.rgb = c_border
+    # Left dark content
+    section_tag(s, 0.55, 0.38, "02  ·  PROJECT BRIEF  ·  A-000")
+    blueprint_accent_line(s, y=0.72)
 
-    tb_s7 = s7.shapes.add_textbox(Inches(9.0), Inches(1.75), Inches(3.3), Inches(4.7))
-    tf_s7 = tb_s7.text_frame
-    tf_s7.word_wrap = True
-    p = tf_s7.paragraphs[0]
-    p.text = "4-Tier BIM Hierarchy"
-    p.font.size = Pt(11.5)
+    t = tb(s, 0.55, 0.85, 5.6, 1.2)
+    tf = t.text_frame
+    tf.word_wrap = True
+    p = tf.paragraphs[0]
+    p.text = "Executive Brief &\nSpatial Zoning Strategy"
+    p.font.size = Pt(28)
     p.font.bold = True
-    p.font.color.rgb = c_text_primary
+    p.font.color.rgb = WHITE
+    p.font.name = "Helvetica Neue"
+
+    desc = tb(s, 0.55, 2.15, 5.6, 0.8)
+    tf_d = desc.text_frame
+    tf_d.word_wrap = True
+    p = tf_d.paragraphs[0]
+    p.text = (
+        "Development of an efficient spatial layout and refined exterior character. "
+        "The project balances a fluid floor plan across private and social zones, "
+        "integrating high-end amenities with distinct material selections."
+    )
+    p.font.size = Pt(10)
+    p.font.color.rgb = SLATE_400
+    p.font.name = "Helvetica Neue"
+
+    # 3 pillars
+    pillars = [
+        ("01", "Strategic Spatial Zoning",
+         "Optimized floor plan separating 4 master bedrooms from a spacious open-concept studio living area with double-height volume."),
+        ("02", "Material & Facade Detail",
+         "Anthracite metal cladding, natural cedar timber battens, triple-pane structural curtain walls — precisely modeled in BIM."),
+        ("03", "Landscape & Water Features",
+         "Curated site with infinity pool, sunken fire pit lounge, decorative water features — all included in the 3D model scope."),
+    ]
+    for i, (num, title, body) in enumerate(pillars):
+        y = 3.1 + i * 1.3
+        add_rect(s, 0.55, y, 0.04, 0.85, BLUE_500)
+        num_t = tb(s, 0.68, y, 0.45, 0.28)
+        p_num = num_t.text_frame.paragraphs[0]
+        p_num.text = num
+        p_num.font.size = Pt(9)
+        p_num.font.bold = True
+        p_num.font.color.rgb = BLUE_400
+        p_num.font.name = "Helvetica Neue"
+
+        t_title = tb(s, 1.22, y, 4.8, 0.3)
+        p_t = t_title.text_frame.paragraphs[0]
+        p_t.text = title
+        p_t.font.size = Pt(11)
+        p_t.font.bold = True
+        p_t.font.color.rgb = WHITE
+        p_t.font.name = "Helvetica Neue"
+
+        t_body = tb(s, 1.22, y + 0.32, 4.8, 0.85)
+        tf_b = t_body.text_frame
+        tf_b.word_wrap = True
+        p_b = tf_b.paragraphs[0]
+        p_b.text = body
+        p_b.font.size = Pt(9)
+        p_b.font.color.rgb = SLATE_400
+        p_b.font.name = "Helvetica Neue"
+
+    # Right panel: BIM Quantities on alabaster
+    t_qto = tb(s, 6.8, 0.5, 6.2, 0.4)
+    p = t_qto.text_frame.paragraphs[0]
+    p.text = "KEY PROJECT QUANTITIES  ·  BIM TAKEOFF"
+    p.font.size = Pt(9)
+    p.font.bold = True
+    p.font.color.rgb = rgb(30, 58, 138)
+    p.font.name = "Helvetica Neue"
+
+    blueprint_accent_line(s, y=1.0)
+    # Override line color with dark blue on light bg
+    acc = add_rect(s, 6.8, 1.0, 5.9, 0.016, BLUE_800)
+
+    metrics = [
+        ("Plot / Site Area",           "840.0 m²"),
+        ("Gross Floor Area (BGF)",      "342.5 m²"),
+        ("Net Usable Area (NRF)",       "278.4 m²"),
+        ("Heated Gross Volume (Ve)",    "965.0 m³"),
+        ("Envelope Surface Area (A)",   "612.0 m²"),
+        ("Compactness Ratio (A/Ve)",    "0.63 m⁻¹"),
+        ("Exterior Glazing Area",       "118.4 m²  (WWR 32%)"),
+        ("Energy Standard",             "Passivhaus / KfW 40"),
+        ("Regulated Standard",          "DIN EN 12831, DIN 277, GEG 2024"),
+    ]
+    for j, (lbl, val) in enumerate(metrics):
+        y = 1.15 + j * 0.67
+        # Row bg alternating
+        row_fill = rgb(240, 245, 255) if j % 2 == 0 else rgb(248, 250, 255)
+        add_rect(s, 6.8, y, 5.9, 0.62, row_fill)
+
+        tl = tb(s, 6.95, y + 0.1, 3.6, 0.42)
+        p = tl.text_frame.paragraphs[0]
+        p.text = lbl
+        p.font.size = Pt(9)
+        p.font.color.rgb = rgb(71, 85, 105)
+        p.font.name = "Helvetica Neue"
+
+        tv = tb(s, 10.0, y + 0.1, 2.5, 0.42)
+        p2 = tv.text_frame.paragraphs[0]
+        p2.text = val
+        p2.font.size = Pt(9.5)
+        p2.font.bold = True
+        p2.font.color.rgb = rgb(30, 58, 138)
+        p2.alignment = PP_ALIGN.RIGHT
+        p2.font.name = "Helvetica Neue"
+
+    add_corner_mark(s)
+
+    # =========================================================================
+    # SLIDE 03: ORTHOGRAPHIC 3D VIEW — full-bleed with floating overlay
+    # =========================================================================
+    s = prs.slides.add_slide(blank)
+    solid_bg(s, OBSIDIAN)
+
+    # Full bleed image
+    picture_if_exists(s, "ortho", 0, 0, width=9.5)
+
+    # Right overlay panel
+    add_rect(s, 9.5, 0, 3.833, 7.5, DARK_CARD)
+    add_rect(s, 9.5, 0, 0.05, 7.5, BLUE_500)  # left accent stripe
+
+    section_tag(s, 9.65, 0.38, "03  ·  3D ARCHITECTURAL VIEW  ·  A-001")
+    acc_l = add_rect(s, 9.65, 0.68, 3.3, 0.016, BLUE_800)
+
+    t_title = tb(s, 9.65, 0.82, 3.5, 1.2)
+    tf = t_title.text_frame
+    tf.word_wrap = True
+    p = tf.paragraphs[0]
+    p.text = "Orthographic\n3D Axonometric"
+    p.font.size = Pt(24)
+    p.font.bold = True
+    p.font.color.rgb = WHITE
+    p.font.name = "Helvetica Neue"
+    add_para(tf, "Model View", 14, color=BLUE_400, space_before=2)
+
+    items = [
+        ("View",        "Orthographic Axon (30°/60°)"),
+        ("Platform",    "Autodesk Revit 2024"),
+        ("LOD",         "LOD 300 Design Dev."),
+        ("Envelope",    "Watertight Thermal Shell"),
+        ("Site",        "Pool, Hardscape, Greenroof"),
+        ("Output",      ".rvt + .pln + IFC4"),
+    ]
+    for i, (k, v) in enumerate(items):
+        y = 2.2 + i * 0.78
+        add_rect(s, 9.65, y, 3.3, 0.68, rgb(16, 22, 38))
+        tk = tb(s, 9.78, y + 0.08, 0.85, 0.25)
+        p = tk.text_frame.paragraphs[0]
+        p.text = k.upper()
+        p.font.size = Pt(7)
+        p.font.bold = True
+        p.font.color.rgb = BLUE_400
+        p.font.name = "Helvetica Neue"
+        tv2 = tb(s, 9.78, y + 0.32, 3.1, 0.3)
+        p2 = tv2.text_frame.paragraphs[0]
+        p2.text = v
+        p2.font.size = Pt(9)
+        p2.font.bold = True
+        p2.font.color.rgb = OFF_WHITE
+        p2.font.name = "Helvetica Neue"
+
+    # Bottom watermark
+    add_rect(s, 0, 6.8, 9.5, 0.7, OBSIDIAN)
+    wm = tb(s, 0.3, 6.88, 9.0, 0.35)
+    p = wm.text_frame.paragraphs[0]
+    p.text = "Modern House: A Study in Minimalism  ·  Autodesk Revit 2024  ·  THE RIBHUS"
+    p.font.size = Pt(8.5)
+    p.font.color.rgb = SLATE_500
+    p.font.name = "Helvetica Neue"
+
+    add_corner_mark(s)
+
+    # =========================================================================
+    # SLIDE 04: FLOOR PLANS — two-column split
+    # =========================================================================
+    s = prs.slides.add_slide(blank)
+    solid_bg(s, OBSIDIAN)
+
+    section_tag(s, 0.55, 0.28, "04  ·  FLOOR PLANS  ·  A-101 / A-102")
+    blueprint_accent_line(s, y=0.6)
+
+    t_h = tb(s, 0.55, 0.72, 8.5, 0.55)
+    tf_h = t_h.text_frame
+    p = tf_h.paragraphs[0]
+    p.text = "Ground Floor + Upper Level Plans  ·  Scale 1:100"
+    p.font.size = Pt(22)
+    p.font.bold = True
+    p.font.color.rgb = WHITE
+    p.font.name = "Helvetica Neue"
+
+    # Ground floor image (left)
+    picture_if_exists(s, "floor", 0.35, 1.42, width=6.2)
+
+    # Upper floor image (right)
+    picture_if_exists(s, "upper", 6.8, 1.42, width=6.1)
+
+    # Bottom stats bar (dark)
+    add_rect(s, 0, 6.4, 13.333, 0.75, DARK_CARD)
+    stats_row = [
+        ("Ground BGF", "185.2 m²"),
+        ("Double-Height Living", "64.8 m²  (5.8m)"),
+        ("Upper BGF", "157.3 m²"),
+        ("Master Bedroom 01", "28.5 m²  + ensuite"),
+        ("Green Roof Terrace", "88.0 m²"),
+        ("DIN Standard", "DIN 1356 / DIN 277"),
+    ]
+    for i, (k, v) in enumerate(stats_row):
+        x = 0.4 + i * 2.15
+        tk = tb(s, x, 6.46, 2.0, 0.22)
+        p = tk.text_frame.paragraphs[0]
+        p.text = k.upper()
+        p.font.size = Pt(7)
+        p.font.bold = True
+        p.font.color.rgb = BLUE_400
+        p.font.name = "Helvetica Neue"
+        tv = tb(s, x, 6.68, 2.0, 0.28)
+        p2 = tv.text_frame.paragraphs[0]
+        p2.text = v
+        p2.font.size = Pt(9.5)
+        p2.font.bold = True
+        p2.font.color.rgb = WHITE
+        p2.font.name = "Helvetica Neue"
+
+    add_corner_mark(s)
+
+    # =========================================================================
+    # SLIDE 05: SECTIONS & ELEVATIONS — side-by-side
+    # =========================================================================
+    s = prs.slides.add_slide(blank)
+    solid_bg(s, OBSIDIAN)
+
+    section_tag(s, 0.55, 0.28, "05  ·  SECTIONS & ELEVATIONS  ·  A-201 / A-301")
+    blueprint_accent_line(s, y=0.6)
+
+    t_h = tb(s, 0.55, 0.72, 8.5, 0.55)
+    tf_h = t_h.text_frame
+    p = tf_h.paragraphs[0]
+    p.text = "Building Sections & Facade Elevations"
+    p.font.size = Pt(22)
+    p.font.bold = True
+    p.font.color.rgb = WHITE
+    p.font.name = "Helvetica Neue"
+
+    # Section (left half)
+    picture_if_exists(s, "section", 0.35, 1.42, width=6.0)
+    # Section label
+    add_rect(s, 0.35, 1.42, 1.4, 0.32, DARK_CARD)
+    lbl = tb(s, 0.45, 1.48, 1.2, 0.2)
+    p = lbl.text_frame.paragraphs[0]
+    p.text = "SECTION  A-201"
+    p.font.size = Pt(7.5)
+    p.font.bold = True
+    p.font.color.rgb = BLUE_400
+    p.font.name = "Helvetica Neue"
+
+    # Elevation (right half)
+    picture_if_exists(s, "elevation", 6.65, 1.42, width=6.0)
+    add_rect(s, 6.65, 1.42, 1.55, 0.32, DARK_CARD)
+    lbl2 = tb(s, 6.75, 1.48, 1.4, 0.2)
+    p2 = lbl2.text_frame.paragraphs[0]
+    p2.text = "ELEVATION  A-301"
+    p2.font.size = Pt(7.5)
+    p2.font.bold = True
+    p2.font.color.rgb = BLUE_400
+    p2.font.name = "Helvetica Neue"
+
+    # Bottom data bar
+    add_rect(s, 0, 6.4, 13.333, 0.75, DARK_CARD)
+    datum = [
+        ("Floor-to-Floor",  "3.30 m"),
+        ("Ground Ceiling",  "2.85 m"),
+        ("Level 1 Ceiling", "2.70 m"),
+        ("Facade",          "Zinc RAL 7016 + Cedar"),
+        ("Glazing Uw",      "0.78 W/m²K (Triple)"),
+        ("Scale",           "1:100"),
+    ]
+    for i, (k, v) in enumerate(datum):
+        x = 0.4 + i * 2.15
+        tk = tb(s, x, 6.46, 2.0, 0.22)
+        p = tk.text_frame.paragraphs[0]
+        p.text = k.upper()
+        p.font.size = Pt(7)
+        p.font.bold = True
+        p.font.color.rgb = BLUE_400
+        p.font.name = "Helvetica Neue"
+        tv = tb(s, x, 6.68, 2.0, 0.28)
+        p2 = tv.text_frame.paragraphs[0]
+        p2.text = v
+        p2.font.size = Pt(9.5)
+        p2.font.bold = True
+        p2.font.color.rgb = WHITE
+        p2.font.name = "Helvetica Neue"
+
+    add_corner_mark(s)
+
+    # =========================================================================
+    # SLIDE 06: EXPLODED AXONOMETRIC — full bleed + dark panel
+    # =========================================================================
+    s = prs.slides.add_slide(blank)
+    solid_bg(s, OBSIDIAN)
+
+    picture_if_exists(s, "axon", 0, 0, width=8.8)
+
+    # Overlay panel
+    add_rect(s, 8.8, 0, 4.533, 7.5, DARK_CARD)
+    add_rect(s, 8.8, 0, 0.05, 7.5, BLUE_500)
+
+    section_tag(s, 9.0, 0.38, "06  ·  BIM HIERARCHY  ·  A-401")
+    add_rect(s, 9.0, 0.68, 3.9, 0.016, BLUE_800)
+
+    t_title = tb(s, 9.0, 0.82, 3.9, 1.0)
+    tf = t_title.text_frame
+    tf.word_wrap = True
+    p = tf.paragraphs[0]
+    p.text = "3D Exploded\nAxonometric"
+    p.font.size = Pt(24)
+    p.font.bold = True
+    p.font.color.rgb = WHITE
+    p.font.name = "Helvetica Neue"
+    add_para(tf, "4-Tier BIM Assembly", 13, color=BLUE_400, space_before=2)
 
     tiers = [
-        ("Tier 4: Roof Deck", "Extensive green roof garden, sedum layer, drainage mat, parapet capping."),
-        ("Tier 3: Upper Level", "4 master suites, lightweight drywall partitions, cantilevered balconies."),
-        ("Tier 2: Ground Floor", "Reinforced concrete columns, floor-to-ceiling glass curtain walls, double garage."),
-        ("Tier 1: Sub-Structure", "Frost-protected foundation slab, site topography, swimming pool basin.")
+        ("T4 · Roof Deck",    EMERALD,  "Sedum greenroof, drainage mat, parapet."),
+        ("T3 · Upper Level",  BLUE_400, "4 master suites, cantilevered balconies."),
+        ("T2 · Ground Floor", BLUE_400, "RC columns, curtain glass, double garage."),
+        ("T1 · Sub-Structure",AMBER,    "Foundation slab, pool basin, topography."),
     ]
-    for t_name, t_desc in tiers:
-        pt = tf_s7.add_paragraph()
-        pt.text = f"▲  {t_name}"
-        pt.font.size = Pt(9.5)
-        pt.font.bold = True
-        pt.font.color.rgb = c_blueprint
-        pt.space_before = Pt(7.5)
+    for i, (tier_name, accent, desc) in enumerate(tiers):
+        y = 2.1 + i * 1.3
+        add_rect(s, 9.0, y, 3.9, 1.15, MID_CARD)
+        add_rect(s, 9.0, y, 0.03, 1.15, accent)
 
-        pd = tf_s7.add_paragraph()
-        pd.text = t_desc
-        pd.font.size = Pt(8.5)
-        pd.font.color.rgb = c_text_secondary
+        t_tn = tb(s, 9.12, y + 0.1, 3.6, 0.28)
+        p = t_tn.text_frame.paragraphs[0]
+        p.text = tier_name
+        p.font.size = Pt(10.5)
+        p.font.bold = True
+        p.font.color.rgb = accent
+        p.font.name = "Helvetica Neue"
+
+        t_td = tb(s, 9.12, y + 0.42, 3.6, 0.65)
+        tf_d = t_td.text_frame
+        tf_d.word_wrap = True
+        p2 = tf_d.paragraphs[0]
+        p2.text = desc
+        p2.font.size = Pt(9)
+        p2.font.color.rgb = SLATE_400
+        p2.font.name = "Helvetica Neue"
+
+    add_corner_mark(s)
 
     # =========================================================================
-    # SLIDE 8: BOARD 07 - BUILDING PHYSICS & DIN EN 12831 AUDIT
+    # SLIDE 07: BUILDING PHYSICS — dark thermal data
     # =========================================================================
-    s8 = prs.slides.add_slide(blank_layout)
-    add_header(s8, "Building Physics & Thermal Envelope Calculation (DIN EN 12831)", "Building Physics", "A-501")
-    add_footer(s8, 8)
+    s = prs.slides.add_slide(blank)
+    solid_bg(s, OBSIDIAN)
 
-    if os.path.exists(img_physics):
-        s8.shapes.add_picture(img_physics, Inches(0.8), Inches(1.55), width=Inches(7.8))
+    section_tag(s, 0.55, 0.28, "07  ·  BUILDING PHYSICS  ·  A-501  ·  DIN EN 12831")
+    blueprint_accent_line(s, y=0.6)
 
-    card_s8 = s8.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(8.8), Inches(1.55), Inches(3.7), Inches(5.15))
-    card_s8.fill.solid()
-    card_s8.fill.fore_color.rgb = c_obsidian
-    card_s8.line.color.rgb = c_obsidian
-
-    tb_s8 = s8.shapes.add_textbox(Inches(9.0), Inches(1.75), Inches(3.3), Inches(4.7))
-    tf_s8 = tb_s8.text_frame
-    tf_s8.word_wrap = True
-    p = tf_s8.paragraphs[0]
-    p.text = "Thermal Envelope Metrics"
-    p.font.size = Pt(11.5)
+    t_h = tb(s, 0.55, 0.72, 8.5, 0.55)
+    p = t_h.text_frame.paragraphs[0]
+    p.text = "Thermal Envelope & Energy Audit Calculation"
+    p.font.size = Pt(22)
     p.font.bold = True
-    p.font.color.rgb = c_white
+    p.font.color.rgb = WHITE
+    p.font.name = "Helvetica Neue"
 
-    physics_items = [
-        ("Exterior Wall U-Value", "0.16 W/m²K (Passiv standard)"),
-        ("Roof Deck U-Value", "0.12 W/m²K (PIR rigid foam)"),
-        ("Ground Slab U-Value", "0.18 W/m²K (EPS perimeter)"),
-        ("Window Assembly Uw", "0.78 W/m²K (Triple glazed)"),
-        ("Envelope Area (A)", "612.0 m² watertight shell"),
-        ("Gross Heated Volume", "965.0 m³"),
-        ("Simulation Software", "Solar-Computer / Hottgenroth")
+    # Energy audit image (left)
+    picture_if_exists(s, "physics", 0.35, 1.42, width=6.9)
+
+    # Right data panel
+    add_rect(s, 7.5, 1.42, 5.45, 5.3, DARK_CARD)
+
+    physics = [
+        ("Exterior Wall U-Value",    "0.16 W/m²K",  "Passivhaus standard — triple mineral wool"),
+        ("Roof Deck U-Value",        "0.12 W/m²K",  "PIR rigid foam — 220mm"),
+        ("Ground Slab U-Value",      "0.18 W/m²K",  "EPS perimeter insulation"),
+        ("Window Assembly (Uw)",     "0.78 W/m²K",  "Triple-pane Argon glass"),
+        ("Envelope Area (A)",        "612.0 m²",     "Watertight thermal boundary"),
+        ("Heated Volume (Ve)",       "965.0 m³",     "Per DIN EN 12831"),
+        ("Energy Standard",          "KfW 40",       "Passivhaus level performance"),
     ]
-    for lbl, v in physics_items:
-        p_it = tf_s8.add_paragraph()
-        p_it.text = f"{lbl}:\n{v}"
-        p_it.font.size = Pt(9)
-        p_it.font.color.rgb = RGBColor(203, 213, 225)
-        p_it.space_before = Pt(6.5)
+    for i, (k, v, note) in enumerate(physics):
+        y = 1.55 + i * 0.72
+        row_bg = MID_CARD if i % 2 == 0 else rgb(12, 16, 26)
+        add_rect(s, 7.5, y, 5.45, 0.68, row_bg)
+        # Key
+        tk = tb(s, 7.65, y + 0.07, 2.2, 0.24)
+        p = tk.text_frame.paragraphs[0]
+        p.text = k.upper()
+        p.font.size = Pt(7)
+        p.font.bold = True
+        p.font.color.rgb = BLUE_400
+        p.font.name = "Helvetica Neue"
+        # Note
+        tn = tb(s, 7.65, y + 0.34, 2.2, 0.28)
+        p2 = tn.text_frame.paragraphs[0]
+        p2.text = note
+        p2.font.size = Pt(7.5)
+        p2.font.color.rgb = SLATE_500
+        p2.font.name = "Helvetica Neue"
+        # Value
+        tv = tb(s, 10.2, y + 0.12, 2.55, 0.42)
+        p3 = tv.text_frame.paragraphs[0]
+        p3.text = v
+        p3.font.size = Pt(13)
+        p3.font.bold = True
+        p3.font.color.rgb = EMERALD
+        p3.alignment = PP_ALIGN.RIGHT
+        p3.font.name = "Helvetica Neue"
+
+    add_corner_mark(s)
 
     # =========================================================================
-    # SLIDE 9: BOARD 08 - REVIT QUANTITIES TAKEOFF (QTO)
+    # SLIDE 08: QTO SCHEDULES — dark data table
     # =========================================================================
-    s9 = prs.slides.add_slide(blank_layout)
-    add_header(s9, "Revit BIM Quantities Takeoff & Component Schedules", "BIM QTO", "A-601")
-    add_footer(s9, 9)
+    s = prs.slides.add_slide(blank)
+    solid_bg(s, OBSIDIAN)
 
-    # Left: Project Photo 1
-    if os.path.exists(img_p1):
-        s9.shapes.add_picture(img_p1, Inches(0.8), Inches(1.55), width=Inches(6.0))
+    section_tag(s, 0.55, 0.28, "08  ·  BIM QTO  ·  A-601  ·  MASSENERMITTLUNG")
+    blueprint_accent_line(s, y=0.6)
 
-    # Right: Detailed Takeoff Table
-    tb_table = s9.shapes.add_textbox(Inches(7.1), Inches(1.55), Inches(5.4), Inches(5.15))
-    tf_tab = tb_table.text_frame
-    tf_tab.word_wrap = True
-
-    p = tf_tab.paragraphs[0]
-    p.text = "Automated Material Schedules (Massenermittlung)"
-    p.font.size = Pt(12)
+    t_h = tb(s, 0.55, 0.72, 8.5, 0.55)
+    p = t_h.text_frame.paragraphs[0]
+    p.text = "Revit Quantities Takeoff & Material Schedules"
+    p.font.size = Pt(22)
     p.font.bold = True
-    p.font.color.rgb = c_text_primary
+    p.font.color.rgb = WHITE
+    p.font.name = "Helvetica Neue"
+
+    picture_if_exists(s, "p1", 0.35, 1.42, width=5.5)
+
+    # QTO table header
+    add_rect(s, 6.1, 1.42, 6.8, 0.45, BLUE_800)
+    th_cols = [("Component / Material", 2.8), ("Quantity", 1.0), ("Scope Note", 2.8)]
+    xc = 6.25
+    for col_name, col_w in th_cols:
+        tc = tb(s, xc, 1.48, col_w, 0.3)
+        p = tc.text_frame.paragraphs[0]
+        p.text = col_name.upper()
+        p.font.size = Pt(8)
+        p.font.bold = True
+        p.font.color.rgb = WHITE
+        p.font.name = "Helvetica Neue"
+        xc += col_w + 0.05
 
     schedules = [
-        ("Concrete C30/37 Volume", "142.6 m³", "Foundation, RC columns & slabs"),
-        ("Exterior Wall Surface", "372.0 m²", "Gross exterior thermal boundary"),
-        ("Glazing & Curtain Walls", "118.4 m²", "WWR: 32% high solar gain glass"),
-        ("Mineral Wool Insulation", "372.0 m²", "160mm rigid insulation (λ = 0.032)"),
-        ("Roof Waterproofing", "176.0 m²", "2-layer bituminous waterproofing"),
-        ("Scheduled Openings", "28 Items", "Full Revit door & window schedule"),
-        ("Interior Drywall Slabs", "485.0 m²", "Non-bearing acoustic partition walls")
+        ("Concrete C30/37 Volume",  "142.6 m³",   "Foundation, RC cols & slabs"),
+        ("Exterior Wall Surface",   "372.0 m²",   "Gross thermal boundary"),
+        ("Glazing & Curtain Walls", "118.4 m²",   "WWR: 32% high solar gain"),
+        ("Mineral Wool Insulation", "372.0 m²",   "160mm rigid (λ = 0.032)"),
+        ("Roof Waterproofing",      "176.0 m²",   "2-layer bituminous"),
+        ("Scheduled Openings",      "28 items",   "Full door & window schedule"),
+        ("Interior Drywall",        "485.0 m²",   "Non-bearing acoustic walls"),
+        ("Steel Framing",           "12.4 t",     "Cantilevered balcony frames"),
     ]
+    for i, (item, qty, note) in enumerate(schedules):
+        y = 1.9 + i * 0.62
+        bg = DARK_CARD if i % 2 == 0 else MID_CARD
+        add_rect(s, 6.1, y, 6.8, 0.58, bg)
+        # Item name
+        ti = tb(s, 6.25, y + 0.1, 2.75, 0.35)
+        p = ti.text_frame.paragraphs[0]
+        p.text = item
+        p.font.size = Pt(9)
+        p.font.color.rgb = OFF_WHITE
+        p.font.name = "Helvetica Neue"
+        # Qty
+        tq = tb(s, 9.05, y + 0.1, 1.05, 0.35)
+        p2 = tq.text_frame.paragraphs[0]
+        p2.text = qty
+        p2.font.size = Pt(9.5)
+        p2.font.bold = True
+        p2.font.color.rgb = BLUE_400
+        p2.alignment = PP_ALIGN.RIGHT
+        p2.font.name = "Helvetica Neue"
+        # Note
+        tn = tb(s, 10.15, y + 0.1, 2.65, 0.35)
+        p3 = tn.text_frame.paragraphs[0]
+        p3.text = note
+        p3.font.size = Pt(8.5)
+        p3.font.color.rgb = SLATE_400
+        p3.font.name = "Helvetica Neue"
 
-    for item, qty, note in schedules:
-        pi = tf_tab.add_paragraph()
-        pi.text = f"■ {item}:  {qty}"
-        pi.font.size = Pt(9.5)
-        pi.font.bold = True
-        pi.font.color.rgb = c_blueprint
-        pi.space_before = Pt(6.5)
-
-        pn = tf_tab.add_paragraph()
-        pn.text = f"   Scope: {note}"
-        pn.font.size = Pt(8.5)
-        pn.font.color.rgb = c_text_secondary
+    add_corner_mark(s)
 
     # =========================================================================
-    # SLIDE 10: URBAN MULTI-STORY REFERENCE (BOARD 09)
+    # SLIDE 09: MULTI-FAMILY REFERENCE
     # =========================================================================
-    s10 = prs.slides.add_slide(blank_layout)
-    add_header(s10, "Urban Multi-Story Residential Portfolio Reference", "Multi-Family BIM", "A-701")
-    add_footer(s10, 10)
+    s = prs.slides.add_slide(blank)
+    solid_bg(s, OBSIDIAN)
 
-    if os.path.exists(img_p2):
-        s10.shapes.add_picture(img_p2, Inches(0.8), Inches(1.55), width=Inches(7.2))
+    picture_if_exists(s, "p2", 0, 0, width=8.5)
+    add_rect(s, 8.5, 0, 4.833, 7.5, DARK_CARD)
+    add_rect(s, 8.5, 0, 0.05, 7.5, BLUE_500)
 
-    card_s10 = s10.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(8.3), Inches(1.55), Inches(4.2), Inches(5.15))
-    card_s10.fill.solid()
-    card_s10.fill.fore_color.rgb = c_light_bg
-    card_s10.line.color.rgb = c_border
+    section_tag(s, 8.65, 0.38, "09  ·  MULTI-FAMILY REFERENCE  ·  A-701")
+    add_rect(s, 8.65, 0.68, 4.3, 0.016, BLUE_800)
 
-    tb_s10 = s10.shapes.add_textbox(Inches(8.5), Inches(1.75), Inches(3.8), Inches(4.7))
-    tf_s10 = tb_s10.text_frame
-    tf_s10.word_wrap = True
-    p = tf_s10.paragraphs[0]
-    p.text = "Multi-Family Residential Scope"
-    p.font.size = Pt(11.5)
+    t_title = tb(s, 8.65, 0.82, 4.3, 1.1)
+    tf = t_title.text_frame
+    tf.word_wrap = True
+    p = tf.paragraphs[0]
+    p.text = "Urban Multi-Story\nResidential Reference"
+    p.font.size = Pt(22)
     p.font.bold = True
-    p.font.color.rgb = c_text_primary
+    p.font.color.rgb = WHITE
+    p.font.name = "Helvetica Neue"
+    add_para(tf, "European Multi-Family BIM", 12, color=BLUE_400, space_before=3)
 
     multi_items = [
-        ("Typology", "Urban Multi-Story Residential Building"),
-        ("Storeys Count", "4 Storeys + Subterranean Parking"),
-        ("Total GFA (BGF)", "1,120.0 m²"),
-        ("Units Count", "12 Residential Apartments"),
-        ("Thermal Zones", "12 Separate DIN EN 12831 Zones"),
-        ("BIM Authoring", "Revit 2024 / OpenBIM IFC4"),
-        ("Turnaround Time", "48 Hours Delivery"),
-        ("MEP Scope", "Strictly Pure Architectural (No MEP)")
+        ("Typology",     "Urban Multi-Story Residential"),
+        ("Storeys",      "4 Floors + Underground Parking"),
+        ("Total GFA",    "1,120 m²"),
+        ("Units",        "12 Residential Apartments"),
+        ("Zones",        "12 DIN EN 12831 Thermal Zones"),
+        ("Platform",     "Revit 2024 / OpenBIM IFC4"),
+        ("Delivery",     "48 Hours"),
+        ("MEP Scope",    "Pure Architectural — No MEP"),
     ]
-    for lbl, v in multi_items:
-        p_it = tf_s10.add_paragraph()
-        p_it.text = f"• {lbl}: {v}"
-        p_it.font.size = Pt(9)
-        p_it.font.color.rgb = c_text_secondary
-        p_it.space_before = Pt(6.5)
+    for i, (k, v) in enumerate(multi_items):
+        y = 2.15 + i * 0.63
+        row_bg = MID_CARD if i % 2 == 0 else DARK_CARD
+        add_rect(s, 8.65, y, 4.3, 0.58, row_bg)
+        tk = tb(s, 8.8, y + 0.1, 1.5, 0.25)
+        p = tk.text_frame.paragraphs[0]
+        p.text = k.upper()
+        p.font.size = Pt(7)
+        p.font.bold = True
+        p.font.color.rgb = BLUE_400
+        p.font.name = "Helvetica Neue"
+        tv = tb(s, 10.35, y + 0.1, 2.5, 0.35)
+        p2 = tv.text_frame.paragraphs[0]
+        p2.text = v
+        p2.font.size = Pt(9)
+        p2.font.bold = True
+        p2.font.color.rgb = WHITE
+        p2.alignment = PP_ALIGN.RIGHT
+        p2.font.name = "Helvetica Neue"
+
+    add_corner_mark(s)
 
     # =========================================================================
-    # SLIDE 11: PRICING & PRODUCTION PACKAGES
+    # SLIDE 10: PRICING — 3 column cards on dark bg
     # =========================================================================
-    s11 = prs.slides.add_slide(blank_layout)
-    add_header(s11, "Transparent, Complexity-Based Production Pricing", "Commercial Scope", "FEES-01")
-    add_footer(s11, 11)
+    s = prs.slides.add_slide(blank)
+    solid_bg(s, OBSIDIAN)
 
-    cards_data = [
-        ("Single-Family & Small Residential", "€180 – €290", "24 – 48 Hours", [
-            "Up to 250 m² Gross Floor Area (BGF)",
-            "LOD 200 / 300 Architectural Shell",
-            "Watertight envelope for energy audit",
-            "Native ArchiCAD (.pln) or Revit (.rvt)",
-            "OpenBIM (.ifc) + 2D PDF Drawing Output",
-            "1 revision round included"
+    # Blueprint glow at top center (simulated with semi-transparent rect)
+    add_rect(s, 3.2, 0, 7.0, 0.8, rgb(12, 28, 68))
+
+    section_tag(s, 0.55, 0.28, "10  ·  COMMERCIAL SCOPE  ·  FEES-01")
+    blueprint_accent_line(s, y=0.6)
+
+    t_h = tb(s, 0.55, 0.72, 12.0, 0.55)
+    tf_h = t_h.text_frame
+    p = tf_h.paragraphs[0]
+    p.text = "Transparent, Complexity-Based Pricing"
+    p.font.size = Pt(24)
+    p.font.bold = True
+    p.font.color.rgb = WHITE
+    p.font.name = "Helvetica Neue"
+    add_para(tf_h, "Every model priced according to GFA, geometry & LOD — no bundles, no surprises.", 10, color=SLATE_400, space_before=3)
+
+    cards = [
+        ("Single-Family\nResidential", "€180\n– €290", "24 – 48 Hours", [
+            "Up to 250 m² BGF",
+            "LOD 200/300 Arch. Shell",
+            "Watertight energy envelope",
+            "Revit (.rvt) or ArchiCAD (.pln)",
+            "OpenBIM (.ifc) + 2D PDF",
+            "1 revision included",
         ], False),
-        ("Multi-Story & Complex Residential", "€450 – €950+", "48 – 72 Hours", [
-            "250 m² to 1,200+ m² Gross Floor Area",
-            "Multi-family, mixed-use, commercial",
-            "Full thermal zone separation per DIN EN 12831",
-            "Detailed Revit system families / ArchiCAD GDL",
-            "QTO component schedules included",
-            "2 revision rounds included"
+        ("Multi-Story\n& Complex", "€450\n– €950+", "48 – 72 Hours", [
+            "250 m² – 1,200+ m² BGF",
+            "Multi-family, mixed-use",
+            "Thermal zone per DIN EN 12831",
+            "Revit system families / GDL",
+            "QTO schedules included",
+            "2 revisions included",
         ], True),
-        ("Dedicated Studio Retainer", "From €1,500 / mo", "Guaranteed 24h", [
-            "Continuous external BIM production pod",
-            "8–15 models per month included",
-            "Priority queue with guaranteed 24h delivery",
-            "Shared templates, titleblocks & layer standards",
-            "Direct Slack / Teams communication channel",
-            "Ideal for high-volume Energieberater"
-        ], False)
+        ("Dedicated\nStudio Retainer", "€1,500\n/month", "Guaranteed 24h", [
+            "External BIM production pod",
+            "8–15 models/month",
+            "Priority 24h queue",
+            "Shared templates & standards",
+            "Direct Slack/Teams channel",
+            "Ideal for Energieberater",
+        ], False),
     ]
+    for i, (title, price, ta, feats, popular) in enumerate(cards):
+        x = 0.35 + i * 4.3
+        card_color = rgb(20, 30, 60) if popular else DARK_CARD
+        card_border = BLUE_500 if popular else rgb(30, 40, 70)
+        add_rect(s, x, 1.55, 4.0, 5.7, card_color)
+        # top accent
+        add_rect(s, x, 1.55, 4.0, 0.06, BLUE_500 if popular else rgb(30, 40, 70))
 
-    left_pos = [Inches(0.8), Inches(4.8), Inches(8.8)]
-    for i, (p_title, p_price, p_time, feats, is_pop) in enumerate(cards_data):
-        card = s11.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left_pos[i], Inches(1.6), Inches(3.7), Inches(5.1))
-        card.fill.solid()
-        if is_pop:
-            card.fill.fore_color.rgb = c_obsidian
-            card.line.color.rgb = c_blueprint
-            card.line.width = Pt(1.5)
-        else:
-            card.fill.fore_color.rgb = c_light_bg
-            card.line.color.rgb = c_border
+        if popular:
+            pill = tb(s, x + 0.7, 1.35, 2.6, 0.28)
+            p_pill = pill.text_frame.paragraphs[0]
+            p_pill.text = "★  Most Requested by Energieberater"
+            p_pill.font.size = Pt(7.5)
+            p_pill.font.bold = True
+            p_pill.font.color.rgb = BLUE_400
+            p_pill.font.name = "Helvetica Neue"
+            p_pill.alignment = PP_ALIGN.CENTER
 
-        tb = s11.shapes.add_textbox(left_pos[i] + Inches(0.25), Inches(1.8), Inches(3.2), Inches(4.7))
-        tf = tb.text_frame
-        tf.word_wrap = True
+        t_tt = tb(s, x + 0.2, 1.68, 3.6, 0.55)
+        tf_tt = t_tt.text_frame
+        tf_tt.word_wrap = True
+        p = tf_tt.paragraphs[0]
+        p.text = title
+        p.font.size = Pt(13)
+        p.font.bold = True
+        p.font.color.rgb = WHITE
+        p.font.name = "Helvetica Neue"
 
-        p0 = tf.paragraphs[0]
-        p0.text = p_title
-        p0.font.size = Pt(10.5)
-        p0.font.bold = True
-        p0.font.color.rgb = c_white if is_pop else c_text_primary
+        t_pr = tb(s, x + 0.2, 2.28, 3.6, 0.75)
+        tf_pr = t_pr.text_frame
+        p = tf_pr.paragraphs[0]
+        p.text = price
+        p.font.size = Pt(26)
+        p.font.bold = True
+        p.font.color.rgb = BLUE_400
+        p.font.name = "Helvetica Neue"
 
-        p_pr = tf.add_paragraph()
-        p_pr.text = p_price
-        p_pr.font.size = Pt(17)
-        p_pr.font.bold = True
-        p_pr.font.color.rgb = c_blueprint if not is_pop else RGBColor(96, 165, 250)
-        p_pr.space_before = Pt(4)
+        t_ta = tb(s, x + 0.2, 3.12, 3.6, 0.3)
+        p = t_ta.text_frame.paragraphs[0]
+        p.text = f"⏱ Turnaround: {ta}"
+        p.font.size = Pt(8.5)
+        p.font.color.rgb = SLATE_400
+        p.font.name = "Helvetica Neue"
 
-        p_tm = tf.add_paragraph()
-        p_tm.text = f"Turnaround: {p_time}"
-        p_tm.font.size = Pt(8.5)
-        p_tm.font.color.rgb = RGBColor(148, 163, 184) if is_pop else c_text_secondary
-        p_tm.space_before = Pt(2)
+        add_rect(s, x + 0.2, 3.48, 3.6, 0.012, BLUE_800)
 
-        for f in feats:
-            pf = tf.add_paragraph()
-            pf.text = f"✓ {f}"
-            pf.font.size = Pt(8.5)
-            pf.font.color.rgb = RGBColor(226, 232, 240) if is_pop else c_text_primary
-            pf.space_before = Pt(5.5)
+        for j, feat in enumerate(feats):
+            y = 3.6 + j * 0.55
+            t_f = tb(s, x + 0.2, y, 3.6, 0.45)
+            tf_f = t_f.text_frame
+            tf_f.word_wrap = True
+            p = tf_f.paragraphs[0]
+            p.text = f"✓  {feat}"
+            p.font.size = Pt(8.5)
+            p.font.color.rgb = OFF_WHITE if popular else SLATE_400
+            p.font.name = "Helvetica Neue"
+
+    # Footnote
+    fn = tb(s, 0.55, 7.1, 12.2, 0.28)
+    p = fn.text_frame.paragraphs[0]
+    p.text = "All models: watertight IFC · native Revit/ArchiCAD · DIN EN 12831 / GEG 2024 / DIN 277 compliant"
+    p.font.size = Pt(8.5)
+    p.font.color.rgb = SLATE_500
+    p.alignment = PP_ALIGN.CENTER
+    p.font.name = "Helvetica Neue"
+
+    add_corner_mark(s)
 
     # =========================================================================
-    # SLIDE 12: STUDIO CONTACT & HOW TO ORDER
+    # SLIDE 11: HOW TO ORDER — process steps
     # =========================================================================
-    s12 = prs.slides.add_slide(blank_layout)
-    bg12 = s12.shapes.add_shape(MSO_SHAPE.RECTANGLE, 0, 0, Inches(13.333), Inches(7.5))
-    bg12.fill.solid()
-    bg12.fill.fore_color.rgb = c_obsidian
-    bg12.line.color.rgb = c_obsidian
+    s = prs.slides.add_slide(blank)
+    solid_bg(s, OBSIDIAN)
 
-    tb_end = s12.shapes.add_textbox(Inches(1.5), Inches(1.5), Inches(10.333), Inches(4.5))
-    tf_end = tb_end.text_frame
-    tf_end.word_wrap = True
+    section_tag(s, 0.55, 0.28, "11  ·  HOW TO ORDER  ·  PROCESS")
+    blueprint_accent_line(s, y=0.6)
 
-    p0 = tf_end.paragraphs[0]
-    p0.text = "THE RIBHUS  •  BIM ARCHITECTURAL ATELIER"
-    p0.font.size = Pt(11)
-    p0.font.bold = True
-    p0.font.color.rgb = RGBColor(96, 165, 250)
-    p0.font.name = "Helvetica Neue"
+    t_h = tb(s, 0.55, 0.72, 8.5, 0.55)
+    p = t_h.text_frame.paragraphs[0]
+    p.text = "3-Step Production Process"
+    p.font.size = Pt(28)
+    p.font.bold = True
+    p.font.color.rgb = WHITE
+    p.font.name = "Helvetica Neue"
 
-    p1 = tf_end.add_paragraph()
-    p1.text = "Ready to convert your 2D plans into 3D BIM models?"
-    p1.font.size = Pt(26)
-    p1.font.bold = True
-    p1.font.color.rgb = c_white
-    p1.space_before = Pt(10)
+    sub = tb(s, 0.55, 1.38, 8.5, 0.35)
+    p = sub.text_frame.paragraphs[0]
+    p.text = "From scanned blueprints to a production-ready BIM model in 24–48 hours."
+    p.font.size = Pt(11)
+    p.font.color.rgb = SLATE_400
+    p.font.name = "Helvetica Neue"
 
-    p2 = tf_end.add_paragraph()
-    p2.text = (
+    steps = [
+        ("01", "SEND YOUR DRAWINGS",
+         "Upload scanned blueprints, PDF plans, 2D DWG files, or hand-survey sketches to contact@theribhus.com. "
+         "Any format accepted — we handle the cleanup."),
+        ("02", "RECEIVE FIXED-PRICE QUOTE",
+         "Within 2–4 hours, we review your drawings and send a detailed fixed-fee quote based on GFA, "
+         "geometry complexity, and required LOD. No hourly billing."),
+        ("03", "GET YOUR BIM MODEL (24–48h)",
+         "Your production-ready Revit (.rvt), ArchiCAD (.pln), and OpenBIM (.ifc) files are delivered "
+         "via secure transfer link within 24–48 hours. DIN EN 12831 compliant."),
+    ]
+    for i, (num, title, body) in enumerate(steps):
+        y = 2.05 + i * 1.65
+        # Card
+        add_rect(s, 0.35, y, 12.633, 1.45, DARK_CARD)
+        add_rect(s, 0.35, y, 0.06, 1.45, BLUE_500)
+
+        t_num = tb(s, 0.55, y + 0.1, 0.6, 0.55)
+        p = t_num.text_frame.paragraphs[0]
+        p.text = num
+        p.font.size = Pt(28)
+        p.font.bold = True
+        p.font.color.rgb = BLUE_500
+        p.font.name = "Helvetica Neue"
+
+        t_tt = tb(s, 1.3, y + 0.12, 3.5, 0.32)
+        p = t_tt.text_frame.paragraphs[0]
+        p.text = title
+        p.font.size = Pt(12)
+        p.font.bold = True
+        p.font.color.rgb = WHITE
+        p.font.name = "Helvetica Neue"
+
+        t_bd = tb(s, 1.3, y + 0.5, 11.3, 0.82)
+        tf_bd = t_bd.text_frame
+        tf_bd.word_wrap = True
+        p = tf_bd.paragraphs[0]
+        p.text = body
+        p.font.size = Pt(9.5)
+        p.font.color.rgb = SLATE_400
+        p.font.name = "Helvetica Neue"
+
+    add_corner_mark(s)
+
+    # =========================================================================
+    # SLIDE 12: CLOSING SLIDE — full obsidian, editorial
+    # =========================================================================
+    s = prs.slides.add_slide(blank)
+    solid_bg(s, OBSIDIAN)
+
+    # Blue vertical stripe accent
+    add_rect(s, 0, 0, 0.07, 7.5, BLUE_500)
+
+    # Grid lines
+    for i in range(12):
+        add_rect(s, 0.07, i * 0.62, 13.263, 0.008, rgb(59, 130, 246))
+
+    section_tag(s, 0.55, 0.35, "12  ·  CONTACT  ·  THE RIBHUS")
+    blueprint_accent_line(s, y=0.7)
+
+    # Main CTA
+    t_cta = tb(s, 0.55, 1.0, 9.5, 2.4)
+    tf_cta = t_cta.text_frame
+    tf_cta.word_wrap = True
+    p = tf_cta.paragraphs[0]
+    p.text = "THE RIBHUS"
+    p.font.size = Pt(13)
+    p.font.bold = True
+    p.font.color.rgb = BLUE_400
+    p.font.name = "Helvetica Neue"
+
+    add_para(tf_cta, "Ready to convert your\n2D plans into 3D BIM?", 42, bold=True, color=WHITE, space_before=6)
+
+    t_desc = tb(s, 0.55, 3.6, 9.0, 0.8)
+    tf_d = t_desc.text_frame
+    tf_d.word_wrap = True
+    p = tf_d.paragraphs[0]
+    p.text = (
         "Send your scanned blueprints, PDF drawings, or DWG surveys. "
-        "We deliver production-ready ArchiCAD (.pln) and Revit (.rvt) models in 24–48 hours."
+        "We deliver production-ready ArchiCAD (.pln) and Revit (.rvt) models "
+        "in 24–48 hours. Strictly architectural — no MEP overhead."
     )
-    p2.font.size = Pt(12)
-    p2.font.color.rgb = RGBColor(203, 213, 225)
-    p2.space_before = Pt(12)
+    p.font.size = Pt(12)
+    p.font.color.rgb = SLATE_400
+    p.font.name = "Helvetica Neue"
 
-    p3 = tf_end.add_paragraph()
-    p3.text = (
-        "✉️ Email: contact@theribhus.com  |  info@theribhus.com\n"
-        "🌐 Website: https://theribhus.com\n"
-        "📂 Live Portfolio: https://ankitk-glitch.github.io/3d-portfolio/\n"
-        "📍 Production Pods: Germany, Austria, Switzerland, European Union\n"
-        "⚡ Deliverables: Autodesk Revit (.rvt), ArchiCAD (.pln), OpenBIM (.ifc), AutoCAD (.dwg)"
-    )
-    p3.font.size = Pt(10.5)
-    p3.font.color.rgb = RGBColor(148, 163, 184)
-    p3.space_before = Pt(18)
+    blueprint_accent_line(s, y=4.55)
 
-    out_file = os.path.join(base_dir, "public/Modern_House_BIM_Portfolio_The_Ribhus.pptx")
-    prs.save(out_file)
-    print(f"SUCCESS: Saved presentation to {out_file}")
+    contact_items = [
+        ("Email",     "contact@theribhus.com"),
+        ("Website",   "theribhus.com"),
+        ("Portfolio", "ankitk-glitch.github.io/3d-portfolio"),
+        ("Region",    "Germany · Austria · Switzerland · EU"),
+        ("Formats",   "Revit (.rvt) · ArchiCAD (.pln) · IFC4 · DWG"),
+    ]
+    for i, (k, v) in enumerate(contact_items):
+        x = 0.55 + (i % 3) * 4.1
+        y = 4.7 + (i // 3) * 1.0
+        tk = tb(s, x, y, 3.8, 0.25)
+        p = tk.text_frame.paragraphs[0]
+        p.text = k.upper()
+        p.font.size = Pt(8)
+        p.font.bold = True
+        p.font.color.rgb = BLUE_400
+        p.font.name = "Helvetica Neue"
+        tv = tb(s, x, y + 0.28, 3.8, 0.4)
+        p2 = tv.text_frame.paragraphs[0]
+        p2.text = v
+        p2.font.size = Pt(11)
+        p2.font.bold = True
+        p2.font.color.rgb = WHITE
+        p2.font.name = "Helvetica Neue"
 
-    # Also copy to workspace root
-    root_out = os.path.join(base_dir, "Modern_House_BIM_Portfolio_The_Ribhus.pptx")
-    prs.save(root_out)
-    print(f"SUCCESS: Saved copy to {root_out}")
+    add_corner_mark(s)
+
+    # ─── Save ────────────────────────────────────────────────────────────────
+    out1 = f"{BASE}/public/Modern_House_BIM_Portfolio_The_Ribhus.pptx"
+    out2 = f"{BASE}/Modern_House_BIM_Portfolio_The_Ribhus.pptx"
+    prs.save(out1)
+    prs.save(out2)
+    print(f"✅  Saved → {out1}")
+    print(f"✅  Saved → {out2}")
 
 if __name__ == "__main__":
     create_presentation()
