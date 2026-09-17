@@ -1,6 +1,7 @@
 import React from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
+import BehanceProject from './components/BehanceRevitProject/BehanceProject';
 import PortfolioBook from './components/PortfolioBook/PortfolioBook';
 import Showcase from './components/Showcase';
 import Pricing from './components/Pricing';
@@ -16,7 +17,10 @@ function App() {
       {/* Hero: Every 2D plan becomes an accurate 3D BIM model */}
       <Hero />
 
-      {/* Multi-Page Architectural Portfolio Book (Matches Template Layout) */}
+      {/* Featured REVIT Modern House Full Project (Behance Style Portfolio Showcase) */}
+      <BehanceProject />
+
+      {/* Architectural Presentation Portfolio Sheets (A3/A4 Deck Mode with PDF Export) */}
       <PortfolioBook />
 
       {/* Selected Architectural Showcase (3 Items from User's MD with Real Images) */}
