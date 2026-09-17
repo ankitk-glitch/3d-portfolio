@@ -38,27 +38,27 @@ export default function PortfolioBook() {
   };
 
   return (
-    <section id="portfolio-deck" className="py-16 bg-slate-100 border-b border-slate-200">
+    <section id="portfolio-deck" className="relative py-16 bg-[#0A0D15] border-t border-white/[0.05]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         
         {/* Presentation Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-slate-300 text-xs font-mono font-bold text-slate-700 shadow-sm mb-2">
-              <FileText size={13} className="text-cyan-700" />
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-blue-500/25 bg-blue-500/[0.08] text-xs font-mono font-bold text-blue-400 mb-3">
+              <FileText size={13} />
               <span>Architectural Presentation Portfolio Sheets</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+            <h2 className="font-display text-2xl sm:text-3xl font-black text-white tracking-tight">
               BIM Portfolio Sheets &bull; Page-by-Page
             </h2>
-            <p className="text-xs sm:text-sm text-slate-600">
-              Structured according to European architectural submission standards. Navigate through individual sheets below or export as a printable PDF.
+            <p className="text-xs sm:text-sm text-slate-500 mt-1">
+              Structured according to European architectural submission standards. Navigate through individual sheets or export as PDF.
             </p>
           </div>
 
           <button
             onClick={handlePrint}
-            className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-cyan-800 text-white font-mono text-xs font-bold flex items-center gap-2 shadow-md transition-all self-start md:self-auto cursor-pointer"
+            className="px-4 py-2.5 rounded-xl border border-white/[0.1] bg-white/[0.03] hover:border-blue-500/40 hover:bg-blue-500/[0.08] text-slate-400 hover:text-white font-mono text-xs font-bold flex items-center gap-2 shadow-md transition-all self-start md:self-auto cursor-pointer"
           >
             <Printer size={15} />
             <span>Print / Save as PDF Portfolio</span>
@@ -66,11 +66,11 @@ export default function PortfolioBook() {
         </div>
 
         {/* Sheet Navigator Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-3 bg-white border border-slate-200 p-3 rounded-2xl shadow-sm">
-          <div className="flex items-center gap-2 text-xs font-mono font-bold text-slate-800">
-            <span className="w-2.5 h-2.5 rounded-full bg-cyan-600"></span>
-            <span>SHEET {currentPage + 1} OF {totalPages}:</span>
-            <span className="text-cyan-800">{sheets[currentPage].title}</span>
+        <div className="flex flex-wrap items-center justify-between gap-3 bg-[#0C101A] border border-white/[0.07] p-3 rounded-2xl">
+          <div className="flex items-center gap-2 text-xs font-mono font-bold text-white">
+            <span className="w-2 h-2 rounded-full bg-blue-400 shadow-[0_0_4px_2px_rgba(96,165,250,0.5)]"></span>
+            <span className="text-slate-500">SHEET {currentPage + 1} OF {totalPages}:</span>
+            <span className="text-blue-400">{sheets[currentPage].title}</span>
           </div>
 
           {/* Quick Jump Buttons */}
@@ -81,8 +81,8 @@ export default function PortfolioBook() {
                 onClick={() => setCurrentPage(s.idx)}
                 className={`px-2.5 py-1 rounded-lg transition-colors cursor-pointer ${
                   currentPage === s.idx
-                    ? 'bg-slate-900 text-white font-bold'
-                    : 'bg-slate-50 hover:bg-slate-100 text-slate-600'
+                    ? 'bg-blue-500 text-white font-bold'
+                    : 'bg-white/[0.04] hover:bg-white/[0.08] text-slate-500 hover:text-white'
                 }`}
               >
                 {s.code}
@@ -95,7 +95,7 @@ export default function PortfolioBook() {
             <button
               onClick={prevPage}
               disabled={currentPage === 0}
-              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
+              className="p-2 rounded-xl border border-white/[0.08] bg-white/[0.03] hover:border-blue-500/30 text-slate-400 hover:text-white disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
               title="Previous Sheet"
             >
               <ChevronLeft size={18} />
@@ -103,7 +103,7 @@ export default function PortfolioBook() {
             <button
               onClick={nextPage}
               disabled={currentPage === totalPages - 1}
-              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
+              className="p-2 rounded-xl border border-white/[0.08] bg-white/[0.03] hover:border-blue-500/30 text-slate-400 hover:text-white disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
               title="Next Sheet"
             >
               <ChevronRight size={18} />
@@ -112,7 +112,7 @@ export default function PortfolioBook() {
         </div>
 
         {/* The Landscape Sheet Board (A3/A4 Landscape 16:10 Ratio) */}
-        <div className="relative w-full aspect-[16/10] sm:aspect-[1.414/1] bg-white text-slate-900 rounded-2xl shadow-xl overflow-hidden border-2 border-slate-800 p-6 sm:p-10 flex flex-col justify-between font-sans print:border-none print:shadow-none print:m-0 print:p-8">
+        <div className="relative w-full aspect-[16/10] sm:aspect-[1.414/1] bg-white text-slate-900 rounded-2xl shadow-xl overflow-hidden border border-white/[0.15] p-6 sm:p-10 flex flex-col justify-between font-sans print:border-none print:shadow-none print:m-0 print:p-8">
           
           {/* ============================================================ */}
           {/* SHEET 1: COVER PAGE                                         */}

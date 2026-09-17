@@ -50,13 +50,13 @@ export default function BehanceProject() {
   };
 
   return (
-    <section id="behance-project" className="bg-[#F8F9FA] text-[#0F172A] py-14 sm:py-24 border-b border-slate-200">
+    <section id="behance-project" className="bg-[#06080F] text-white py-14 sm:py-24 border-t border-white/[0.05]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
 
         {/* ==================================================================== */}
         {/* BEHANCE HEADER & PROJECT TITLE BLOCK                                */}
         {/* ==================================================================== */}
-        <div className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-12 shadow-sm space-y-9">
+        <div className="bg-[#0C101A] border border-white/[0.08] rounded-3xl p-6 sm:p-12 shadow-2xl space-y-9">
           
           {/* Top Breadcrumb & Studio Badge */}
           <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-6">

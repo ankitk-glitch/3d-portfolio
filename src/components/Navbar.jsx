@@ -1,118 +1,124 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Layers, Menu, X, ArrowUpRight, Sparkles } from 'lucide-react';
+import { Menu, X, ArrowUpRight, Sparkles } from 'lucide-react';
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const navLinks = [
-    { label: 'REVIT Modern House', href: '#behance-project', featured: true },
-    { label: 'Portfolio Sheets', href: '#portfolio-deck' },
-    { label: 'Model Showcase', href: '#showcase' },
-    { label: 'Pricing (€180+)', href: '#pricing' },
-    { label: 'Requirement Form', href: '#request-form' },
+    { label: 'REVIT Project', href: '#behance-project', featured: true },
+    { label: 'Portfolio', href: '#portfolio-deck' },
+    { label: 'Showcase', href: '#showcase' },
+    { label: 'Pricing', href: '#pricing' },
   ];
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         scrolled
-          ? 'bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-[0_1px_8px_rgba(0,0,0,0.04)] py-3'
-          : 'bg-[#FAFAFA]/90 backdrop-blur-sm border-b border-slate-200/50 py-4'
+          ? 'bg-[#06080F]/95 backdrop-blur-xl border-b border-white/[0.06] shadow-[0_1px_40px_rgba(0,0,0,0.6)]'
+          : 'bg-transparent border-b border-white/[0.04]'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-        {/* Studio Logo & Identity */}
-        <a href="#" className="flex items-center gap-3.5 group">
-          <div className="w-9 h-9 rounded-xl bg-[#0F172A] flex items-center justify-center text-white shadow-sm group-hover:bg-[#1E3A8A] transition-colors">
-            <Box size={19} className="stroke-[2.2]" />
-          </div>
-          <div>
-            <div className="font-display font-black text-sm sm:text-base tracking-tight text-[#0F172A] flex items-center gap-2">
-              THE RIBHUS
-              <span className="text-[9px] font-mono font-bold tracking-widest px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
-                BIM ATELIER
-              </span>
-            </div>
-            <div className="text-[10px] font-mono tracking-tight text-slate-500">
-              theribhus.com &bull; European Architectural 3D Modeling
-            </div>
-          </div>
-        </a>
+      {/* Blueprint accent top bar */}
+      <div className="h-[2px] bg-gradient-to-r from-transparent via-blue-500/60 to-transparent" />
 
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-7">
-          {navLinks.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              className={`transition-all flex items-center gap-1.5 ${
-                link.featured
-                  ? 'px-3 py-1.5 rounded-lg bg-[#0F172A] text-white font-mono text-[11px] font-bold tracking-wider uppercase shadow-sm hover:bg-[#1E3A8A]'
-                  : 'font-mono text-[11px] uppercase tracking-wider font-semibold text-slate-600 hover:text-[#0F172A]'
-              }`}
-            >
-              {link.featured && <Sparkles size={11} className="text-amber-300" />}
-              <span>{link.label}</span>
-            </a>
-          ))}
-        </nav>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 lg:h-18">
 
-        {/* Action CTA */}
-        <div className="hidden lg:flex items-center gap-4">
-          <a
-            href="#request-form"
-            className="px-4 py-2 rounded-xl bg-white hover:bg-slate-50 text-[#0F172A] border border-slate-300 font-mono text-[11px] font-bold uppercase tracking-wider shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"
-          >
-            <span>Send 2D Plans</span>
-            <ArrowUpRight size={13} />
+          {/* Logo */}
+          <a href="#" className="flex items-center gap-3 group shrink-0">
+            {/* Blueprint box mark */}
+            <div className="relative w-8 h-8">
+              <div className="absolute inset-0 rounded-lg bg-blue-500/20 border border-blue-500/40 group-hover:border-blue-400/60 transition-colors" />
+              <div className="absolute inset-[3px] rounded-md bg-blue-500 flex items-center justify-center">
+                <span className="text-white font-display font-black text-[10px] tracking-widest">R</span>
+              </div>
+            </div>
+            <div className="leading-none">
+              <div className="font-display font-black text-[13px] sm:text-sm tracking-[0.12em] text-white uppercase">
+                The Ribhus
+              </div>
+              <div className="font-mono text-[9px] tracking-[0.18em] text-blue-400/70 uppercase mt-0.5">
+                BIM Atelier · theribhus.com
+              </div>
+            </div>
           </a>
-        </div>
 
-        {/* Mobile Menu Toggle */}
-        <div className="flex md:hidden">
+          {/* Desktop nav */}
+          <nav className="hidden md:flex items-center gap-1">
+            {navLinks.map((link) => (
+              <a
+                key={link.label}
+                href={link.href}
+                className={`relative px-3.5 py-2 font-mono text-[10px] uppercase tracking-[0.12em] font-semibold transition-all group ${
+                  link.featured
+                    ? 'text-[#06080F] bg-blue-500 hover:bg-blue-400 rounded-lg ml-2'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                {link.featured && <Sparkles size={9} className="inline mr-1 text-white/80" />}
+                {link.label}
+                {!link.featured && (
+                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-px w-0 bg-blue-400 group-hover:w-4/5 transition-all duration-300" />
+                )}
+              </a>
+            ))}
+          </nav>
+
+          {/* CTA */}
+          <div className="hidden lg:flex items-center gap-3">
+            <a
+              href="#request-form"
+              className="btn-glow flex items-center gap-1.5 px-4 py-2 rounded-lg border border-blue-500/40 bg-blue-500/10 hover:bg-blue-500/20 text-blue-300 hover:text-white font-mono text-[10px] uppercase tracking-[0.1em] font-bold transition-all"
+            >
+              <span>Send 2D Plans</span>
+              <ArrowUpRight size={12} />
+            </a>
+          </div>
+
+          {/* Mobile toggle */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer"
+            className="md:hidden p-2 rounded-lg border border-white/10 text-slate-400 hover:text-white hover:border-white/20 transition-all"
           >
-            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Menu Dropdown */}
+      {/* Mobile menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-white border-b border-slate-200 px-4 pt-3 pb-6 space-y-3 shadow-xl">
+        <div className="md:hidden bg-[#0A0D15]/98 backdrop-blur-xl border-b border-white/[0.06] px-4 pt-2 pb-6 animate-fadeIn">
+          <div className="blueprint-divider mb-4" />
           {navLinks.map((link) => (
             <a
               key={link.label}
               href={link.href}
               onClick={() => setMobileMenuOpen(false)}
-              className={`block px-3 py-2 rounded-lg text-xs font-mono uppercase tracking-wider font-semibold ${
+              className={`block px-3 py-3 rounded-lg font-mono text-[11px] uppercase tracking-wider font-semibold mb-1 ${
                 link.featured
-                  ? 'bg-[#0F172A] text-white font-bold'
-                  : 'text-slate-700 hover:bg-slate-100'
+                  ? 'bg-blue-500 text-white'
+                  : 'text-slate-400 hover:text-white hover:bg-white/5'
               }`}
             >
               {link.label}
             </a>
           ))}
-          <div className="pt-2">
+          <div className="pt-3">
             <a
               href="#request-form"
               onClick={() => setMobileMenuOpen(false)}
-              className="w-full py-2.5 rounded-xl bg-[#0F172A] text-white font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2"
+              className="w-full py-3 rounded-xl border border-blue-500/40 bg-blue-500/10 text-blue-300 font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2"
             >
-              <span>Send 2D Plans &bull; 24h Turnaround</span>
-              <ArrowUpRight size={14} />
+              Send 2D Plans · 24h Turnaround
+              <ArrowUpRight size={13} />
             </a>
           </div>
         </div>

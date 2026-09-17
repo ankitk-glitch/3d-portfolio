@@ -7,60 +7,137 @@
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
   }
   body {
-    @apply bg-[#F9FAFB] text-[#0F172A] font-sans antialiased selection:bg-[#0F172A] selection:text-white;
+    @apply bg-[#06080F] text-[#E2E8F0] font-sans antialiased;
+    selection-color: #0A0F1D;
+  }
+  ::selection {
+    background: #3B82F6;
+    color: #fff;
   }
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display tracking-tight text-[#0A0F1D];
+    @apply font-display tracking-tight;
   }
 }
 
-/* Precision Architectural Grid Pattern */
+/* ─── Dark Architectural Blueprint Grid ─── */
 .bg-arch-grid {
-  background-size: 24px 24px;
-  background-image: 
-    linear-gradient(to right, rgba(15, 23, 42, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
+  background-color: #06080F;
+  background-size: 40px 40px;
+  background-image:
+    linear-gradient(to right, rgba(59,130,246,0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(59,130,246,0.07) 1px, transparent 1px);
 }
 
-.bg-dot-pattern {
-  background-size: 16px 16px;
-  background-image: radial-gradient(circle, rgba(15, 23, 42, 0.09) 1px, transparent 1px);
+/* Fine grid overlay (8px sub-grid) */
+.bg-arch-grid::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-size: 8px 8px;
+  background-image:
+    linear-gradient(to right, rgba(59,130,246,0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(59,130,246,0.03) 1px, transparent 1px);
+  pointer-events: none;
 }
 
-/* Clean Architectural Paper Border */
-.arch-border {
-  border: 1px solid #E2E8F0;
+/* Light surface blueprint grid */
+.bg-light-grid {
+  background-color: #F8FAFF;
+  background-size: 32px 32px;
+  background-image:
+    linear-gradient(to right, rgba(30,58,138,0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(30,58,138,0.06) 1px, transparent 1px);
 }
 
-/* Print Styles for Clean A3/A4 Landscape PDF Export */
-@media print {
-  body {
-    background: white !important;
-    color: black !important;
-  }
-  header, footer, nav, .no-print {
-    display: none !important;
-  }
-  .print-page {
-    page-break-after: always;
-    break-after: page;
-    box-shadow: none !important;
-    border: none !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-  }
+/* ─── Blueprint Glow / Radial ─── */
+.blueprint-glow {
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(59,130,246,0.15) 0%, transparent 70%);
 }
 
-/* Subtle Entry Animation */
+/* ─── Scan Line Shimmer ─── */
+@keyframes scanLine {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+.scan-line {
+  position: absolute;
+  left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, rgba(59,130,246,0.4) 50%, transparent 100%);
+  animation: scanLine 6s linear infinite;
+  pointer-events: none;
+}
+
+/* ─── Section Reveal Animation ─── */
+@keyframes revealUp {
+  from { opacity: 0; transform: translateY(32px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes revealLeft {
+  from { opacity: 0; transform: translateX(-24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeIn { animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-revealUp { animation: revealUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-revealLeft { animation: revealLeft 0.7s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+/* ─── Staggered delays ─── */
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
+.delay-500 { animation-delay: 0.5s; }
+
+/* ─── Blueprint accent divider ─── */
+.blueprint-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(59,130,246,0.5) 50%, transparent 100%);
 }
 
-.animate-fadeIn {
-  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+/* ─── Glowing CTA ─── */
+.btn-glow {
+  box-shadow: 0 0 0 0 rgba(59,130,246,0.5);
+  transition: box-shadow 0.3s ease;
 }
+.btn-glow:hover {
+  box-shadow: 0 0 28px 6px rgba(59,130,246,0.25);
+}
+
+/* ─── Print ─── */
+@media print {
+  body { background: white !important; color: black !important; }
+  header, footer, nav, .no-print { display: none !important; }
+  .print-page {
+    page-break-after: always; break-after: page;
+    box-shadow: none !important; border: none !important;
+    margin: 0 !important; padding: 0 !important;
+    width: 100% !important; height: 100% !important;
+  }
+}
+
+/* ─── Ticker/marquee ─── */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.marquee-track { animation: marquee 30s linear infinite; }
+
+/* ─── Card hover lift ─── */
+.card-lift {
+  transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), box-shadow 0.3s ease;
+}
+.card-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 24px 48px -12px rgba(0,0,0,0.6), 0 0 0 1px rgba(59,130,246,0.2);
+}
+
+/* ─── Architectural paper border ─── */
+.arch-border { border: 1px solid rgba(255,255,255,0.08); }
+
