@@ -107,6 +107,16 @@ export default function BehanceProject() {
                 <span>{appreciations} {hasAppreciated ? 'Appreciated' : 'Appreciate'}</span>
               </button>
 
+              <a
+                href="Modern_House_BIM_Portfolio_The_Ribhus.pptx"
+                download="Modern_House_BIM_Portfolio_The_Ribhus.pptx"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 text-xs font-mono font-bold shadow-sm transition-all cursor-pointer"
+                title="Download 16:9 PowerPoint Presentation (.PPTX)"
+              >
+                <Download size={14} className="text-amber-700" />
+                <span>Download PPT</span>
+              </a>
+
               <button
                 onClick={handlePrint}
                 className="hidden sm:flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-mono font-bold shadow-sm transition-all cursor-pointer"
